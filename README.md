@@ -16,5 +16,6 @@ npm run dev
 - [Getting started](docs/getting-started.md) — requirements, scripts and running the project
 - [Architecture](docs/architecture.md) — project structure and how client and server fit together
 - [Home page spec](docs/specs/home-page.md) — home page requirements
+- [Countdown link spec](docs/specs/countdown-link.md) — link format, token and generation rules
 - [Style guide](docs/specs/style-guide.md) — colors, typography, form components and logo
 - [Deployment](docs/deployment.md) — GitHub Pages deploy from `main`

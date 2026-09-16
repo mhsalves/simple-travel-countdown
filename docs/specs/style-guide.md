@@ -119,7 +119,11 @@ A single theme created with `createTheme` and applied with `ThemeProvider` + `Cs
 | Gradient presets      | `ToggleButton` grid (2 columns on mobile, 4 from `sm`) | Presets from 1.4 with a gradient swatch; selecting one also sets both font colors to its recommended color |
 | Background / font colors | `TextField` with a native color swatch in `InputAdornment` | Editable hex value (invalid values are flagged and reverted on blur); labels: Background color, Start color, End color, Title color, Counter color |
 | Image URL             | `TextField` (`type="url"`)                        | `error` + `helperText` when the URL is not `http(s)`     |
-| Generate link         | `Button` (`variant="contained"`, `size="large"`, `fullWidth`) | Primary color                              |
+| Generate link         | `Button` (`type="submit"`, `variant="contained"`, `size="large"`, `fullWidth`) | Primary color              |
+| Field errors          | `error` + `helperText` on the field               | Shown after the first generate attempt; the title counter is replaced by its error |
+| Link success          | `Dialog` (`maxWidth="sm"`, `fullWidth`)           | `DialogTitle` with `CheckCircleRounded` in `success` color; read-only `TextField` with the link |
+| Copy link             | `Button` (`variant="contained"`)                  | `ContentCopyRounded` icon; after copying: `success` color, `CheckRounded` icon and "Copied" |
+| Copy failure          | `Alert` (`severity="error"`)                      | Inside the dialog, below the link                        |
 | Field groups          | `Stack` (`spacing={2.5}`) and `FormLabel`         |                                                          |
 
 ### 3.4 Spacing and shape

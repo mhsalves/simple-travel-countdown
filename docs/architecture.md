@@ -39,5 +39,5 @@ The project is an npm workspaces monorepo with two packages.
 
 | Page           | Status      | Description                                                                 |
 | -------------- | ----------- | --------------------------------------------------------------------------- |
-| Home           | In progress | Countdown form with live preview; link generation pending ([spec](specs/home-page.md)) |
+| Home           | Done        | Countdown form with live preview and link generation ([spec](specs/home-page.md), [link rules](specs/countdown-link.md)) |
 | Countdown view | Planned     | Displays the counter according to the link's configuration                  |

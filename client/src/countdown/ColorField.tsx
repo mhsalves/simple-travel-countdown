@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
-
-const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+import { isHexColor } from './config';
 
 interface ColorFieldProps {
   label: string;
@@ -20,7 +19,7 @@ function ColorField({ label, value, onChange }: ColorFieldProps) {
 
   function handleTextChange(text: string) {
     setDraft(text);
-    if (HEX_COLOR.test(text)) {
+    if (isHexColor(text)) {
       onChange(text.toUpperCase());
     }
   }
@@ -29,7 +28,7 @@ function ColorField({ label, value, onChange }: ColorFieldProps) {
     <TextField
       label={label}
       value={draft}
-      error={!HEX_COLOR.test(draft)}
+      error={!isHexColor(draft)}
       onChange={(event) => handleTextChange(event.target.value)}
       onBlur={() => setDraft(value)}
       slotProps={{
