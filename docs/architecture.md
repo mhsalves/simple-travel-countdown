@@ -6,6 +6,7 @@ The project is an npm workspaces monorepo with two packages.
 .
 ├── client/              React 17 + TypeScript app (Vite)
 │   ├── index.html
+│   ├── public/          Static files served as-is (favicons)
 │   ├── src/
 │   │   ├── main.tsx     App entry point
 │   │   ├── App.tsx      Root component

@@ -131,15 +131,18 @@ A single theme created with `createTheme` and applied with `ThemeProvider` + `Cs
 
 ### 4.1 Design
 
-![Travel Countdown logo](assets/logo.svg)
+<img src="../../client/public/favicon.svg" alt="Travel Countdown logo" width="96" height="96" />
 
-Source: [`assets/logo.svg`](assets/logo.svg)
+Source: [`client/public/favicon.svg`](../../client/public/favicon.svg), mirrored by the `Logo` component (`client/src/components/Logo.tsx`).
 
-The mark combines the two ideas of the product:
+The mark combines the two themes of the product, **travelling** and **countdown**:
 
-- **Clock** (white ring and hands): the countdown.
-- **Plane** (Sun yellow) flying clockwise through a gap in the ring: the trip, and time moving towards it.
+- **Countdown ring**: a faint full circle (white, 30% opacity) with a solid white arc covering three quarters, read as a progress ring running out.
+- **Clock hands** (white): time.
+- **Plane** (Sun yellow) flying clockwise through the remaining quarter towards 12 o'clock: the trip getting closer as the countdown ends.
 - **Badge**: rounded square in Ocean blue, corner radius 25% of the size.
+
+Geometry on a 48 × 48 grid: ring centered at (24, 24), radius 14, stroke 3.5; hands stroke 3.5 with round caps.
 
 The **lockup** is the mark followed by the name "Travel Countdown" in Inter 700, vertically centered, with a gap of 1/3 of the mark size.
 
@@ -165,5 +168,7 @@ The **lockup** is the mark followed by the name "Travel Countdown" in Inter 700,
 | Home — form                   | Not used                 | —         | —                                   |
 | Home — preview                | Not used (user content)  | —         | —                                   |
 | Countdown view (planned)      | Monochrome lockup, bottom corner | 20px | 0.75rem, counter font color at 80% opacity, links to the home page |
-| Favicon / browser tab         | Full color mark          | 16px, 32px | —                                  |
-| Apple touch icon              | Full color mark          | 180px     | —                                   |
+| Favicon / browser tab         | Full color mark (`favicon.svg`, fallback `favicon-32.png`) | 16px, 32px | —   |
+| Apple touch icon              | Full color mark with square badge (`apple-touch-icon.png`, the OS applies the corner mask) | 180px | — |
+
+Favicon files live in `client/public/` and are linked from `client/index.html`.
