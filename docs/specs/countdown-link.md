@@ -5,7 +5,7 @@ Rules for the link created by the **Generate link** button on the home page. For
 ## 1. Requirements
 
 - The link path is `/countdown`, keeping the project's base URL format.
-- After the path comes a base64 token (`/countdown/<token>`) containing the form data as JSON. The token is the only source used to read the countdown configuration.
+- After the path comes a base64 token (`/countdown/<token>`) containing the form data as a compact binary payload. The token is the only source used to read the countdown configuration.
 - After generating the link, a success message opens with an option to copy the generated link.
 
 ## 2. URL format
@@ -23,53 +23,49 @@ Rules for the link created by the **Generate link** button on the home page. For
 Examples:
 
 ```
-http://localhost:3029/countdown/eyJ2IjoxLCJ0aXRsZSI6IlRyaXAgdG8gTGlzYm9uIiwi...
-https://matheusalves.dev/simple-travel-countdown/countdown/eyJ2IjoxLCJ0aXRsZSI6IlRyaXAgdG8gTGlzYm9uIiwi...
+http://localhost:3029/countdown/AQ5UcmlwIHRvIExpc2JvbmuRNDgBC26ZCnqU________
+https://matheusalves.dev/simple-travel-countdown/countdown/AQ5UcmlwIHRvIExpc2JvbmuRNDgBC26ZCnqU________
 ```
 
 ## 3. Token
 
 ### 3.1 Encoding
 
-1. Build the JSON payload (section 3.2) and serialize it with `JSON.stringify`.
-2. Encode the string as **UTF-8** bytes, so titles with accents or emoji are preserved.
-3. Encode the bytes as **base64url** ([RFC 4648 §5](https://www.rfc-editor.org/rfc/rfc4648#section-5)): standard base64 with `+` → `-`, `/` → `_` and the `=` padding removed.
+The payload (section 3.2) is packed as **fixed-width binary fields**, not JSON, so the token stays as short as possible: colors are raw RGB bytes instead of `"#RRGGBB"` strings, and the finish date is a 4-byte integer instead of an ISO string.
+
+1. Build the binary payload (section 3.2), producing a byte array.
+2. Encode the bytes as **base64url** ([RFC 4648 §5](https://www.rfc-editor.org/rfc/rfc4648#section-5)): standard base64 with `+` → `-`, `/` → `_` and the `=` padding removed.
 
 base64url is required because standard base64 may contain `/`, which would split the token into extra path segments, and `+`/`=`, which are not safe in URLs.
 
-Decoding reverses the steps: base64url → bytes → UTF-8 string (invalid UTF-8 is rejected) → `JSON.parse` → validation (section 4.2).
+Decoding reverses the steps: base64url → bytes → binary payload → validation (section 4.2). A structurally malformed byte array (wrong length, unknown enum value, trailing bytes) is an invalid token.
+
+Implemented in `client/src/countdown/binary.ts` (see section 6).
 
 ### 3.2 Payload
 
-```json
-{
-  "v": 1,
-  "title": "Trip to Lisbon",
-  "finishDate": "2027-03-10T11:30:00.000Z",
-  "background": { "type": "gradient", "from": "#0B6E99", "to": "#0A7A94" },
-  "titleColor": "#FFFFFF",
-  "counterColor": "#FFFFFF"
-}
-```
+Byte layout, in order:
 
-| Field          | Type   | Rules                                                                 |
-| -------------- | ------ | --------------------------------------------------------------------- |
-| `v`            | number | Payload version. Current version: `1`                                 |
-| `title`        | string | Trimmed, 1–60 characters                                              |
-| `finishDate`   | string | ISO 8601 in UTC (`Date.toISOString()`), so every viewer counts down to the same instant regardless of time zone |
-| `background`   | object | One of the shapes below                                               |
-| `titleColor`   | string | Hex color `#RRGGBB`                                                   |
-| `counterColor` | string | Hex color `#RRGGBB`                                                   |
+| Field           | Size                          | Rules                                                                 |
+| --------------- | ------------------------------ | ---------------------------------------------------------------------- |
+| Format version  | 1 byte                          | Current version: `1`                                                   |
+| Title length    | 1 byte (`N`, 0–255)             | Length **in UTF-8 bytes** of the title that follows                    |
+| Title           | `N` bytes                       | UTF-8 text. Trimmed, 1–60 **characters** (not bytes)                   |
+| Finish date     | 4 bytes, unsigned big-endian    | Unix time in **seconds**, UTC. Sub-second precision is not preserved (the countdown display only shows whole seconds, so nothing is lost) |
+| Background type | 1 byte                          | `0` = solid, `1` = gradient, `2` = image                                |
+| Background data | variable, depends on type       | See background shapes below                                            |
+| Title color     | 3 bytes (R, G, B)               | Raw color bytes, no `#` or hex text                                     |
+| Counter color   | 3 bytes (R, G, B)               | Raw color bytes, no `#` or hex text                                     |
 
-Background shapes:
+Background shapes (immediately after the background type byte):
 
-| `type`     | Fields                          | Rules                                         |
-| ---------- | ------------------------------- | --------------------------------------------- |
-| `solid`    | `color`                         | Hex color `#RRGGBB`                           |
-| `gradient` | `from`, `to`                    | Hex colors `#RRGGBB`                          |
-| `image`    | `url`                           | `http://` or `https://` URL, up to 1000 characters |
+| `type`     | Bytes                                                          | Rules                                              |
+| ---------- | ---------------------------------------------------------------- | --------------------------------------------------- |
+| `solid`    | 3 bytes (R, G, B)                                                 | Raw color bytes                                     |
+| `gradient` | 3 bytes (R, G, B) `from` + 3 bytes (R, G, B) `to`                 | Raw color bytes                                     |
+| `image`    | 2 bytes unsigned big-endian length (`M`) + `M` bytes UTF-8 URL    | `http://` or `https://` URL, up to 1000 characters  |
 
-When generating, hex colors are written in uppercase and no other fields are included. When reading, hex colors are accepted in any case and unknown fields are ignored.
+When generating, colors are read from `#RRGGBB` input and written as raw bytes. When reading, raw bytes are converted back to an uppercase `#RRGGBB` string — there is no casing concern on the wire since no hex text is stored.
 
 ## 4. Validation
 
@@ -88,7 +84,7 @@ Title length (60) and image URL length (1000) are enforced by the inputs, and co
 
 ### 4.2 When reading a token
 
-A token is valid only if it decodes (section 3.1) and the payload matches every rule in section 3.2, with `v` equal to `1`. A valid token whose `finishDate` is in the past is still valid: the countdown shows as finished. Invalid tokens produce no configuration, and the page reading them must show an invalid link message.
+A token is valid only if it decodes (section 3.1) and the payload matches every rule in section 3.2, with the format version equal to `1`. A valid token whose finish date is in the past is still valid: the countdown shows as finished. Invalid tokens produce no configuration, and the page reading them must show an invalid link message.
 
 ## 5. Success feedback
 
@@ -107,10 +103,11 @@ Each generation creates the link from the current form values and resets the cop
 
 ## 6. Implementation
 
-| Concern                    | Location                              |
-| -------------------------- | ------------------------------------- |
-| Encode, decode, build link | `client/src/countdown/link.ts`        |
-| Form validation            | `client/src/countdown/validation.ts`  |
-| Success dialog             | `client/src/countdown/LinkDialog.tsx` |
+| Concern                     | Location                              |
+| --------------------------- | -------------------------------------- |
+| Binary payload encode/decode | `client/src/countdown/binary.ts`      |
+| base64url, build link       | `client/src/countdown/link.ts`        |
+| Form validation             | `client/src/countdown/validation.ts`  |
+| Success dialog              | `client/src/countdown/LinkDialog.tsx` |
 
 The page that reads the token and displays the countdown is not part of this specification.
