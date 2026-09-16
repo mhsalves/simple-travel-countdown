@@ -1,5 +1,8 @@
 import { CSSProperties } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
+import happyBirthdayImage from '../assets/backgrounds/happy-birthday.jpg';
+import happyNewYearImage from '../assets/backgrounds/happy-new-year.jpg';
+import orlandoParkImage from '../assets/backgrounds/orlando-park.jpg';
 
 export const TITLE_MAX_LENGTH = 60;
 export const IMAGE_URL_MAX_LENGTH = 1000;
@@ -38,6 +41,27 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
 
 const [DEFAULT_PRESET] = GRADIENT_PRESETS;
 const IMAGE_FONT_COLOR = '#FFFFFF';
+
+export interface ImagePreset {
+  name: string;
+  asset: string;
+  fontColor: string;
+}
+
+// Bundled preset photos for the Image background option. Assets are resolved
+// relative to the app's base URL, so they load correctly wherever this app is deployed.
+// Font colors are picked by contrast against the text's actual position (centered,
+// under the 0.4 black overlay), not the image's whole-frame average: white wins the
+// worst-case contrast on all three despite looking closest on the lighter two.
+export const IMAGE_PRESETS: ImagePreset[] = [
+  { name: 'New Year', asset: happyNewYearImage, fontColor: '#FFFFFF' },
+  { name: 'Birthday', asset: happyBirthdayImage, fontColor: '#FFFFFF' },
+  { name: 'Orlando', asset: orlandoParkImage, fontColor: '#FFFFFF' },
+];
+
+export function resolveAssetUrl(asset: string): string {
+  return new URL(asset, window.location.origin).toString();
+}
 
 export function createDefaultConfig(): CountdownConfig {
   return {

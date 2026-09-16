@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import AddPhotoAlternateRoundedIcon from '@mui/icons-material/AddPhotoAlternateRounded';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import ColorField from './ColorField';
 import {
@@ -16,11 +17,14 @@ import {
   CountdownConfig,
   GRADIENT_PRESETS,
   GradientPreset,
+  IMAGE_PRESETS,
   IMAGE_URL_MAX_LENGTH,
+  ImagePreset,
   TITLE_MAX_LENGTH,
   createBackground,
   getDefaultFontColor,
   isHttpUrl,
+  resolveAssetUrl,
 } from './config';
 import { IMAGE_URL_ERROR, hasErrors, validateCountdownConfig } from './validation';
 
@@ -68,6 +72,26 @@ function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
       titleColor: preset.fontColor,
       counterColor: preset.fontColor,
     });
+  }
+
+  const selectedImagePreset =
+    background.type === 'image' ? IMAGE_PRESETS.find((preset) => resolveAssetUrl(preset.asset) === background.url) : undefined;
+  const isCustomImage = background.type === 'image' && !selectedImagePreset;
+
+  function applyImagePreset(preset: ImagePreset) {
+    update({
+      background: { type: 'image', url: resolveAssetUrl(preset.asset) },
+      titleColor: preset.fontColor,
+      counterColor: preset.fontColor,
+    });
+  }
+
+  function switchToCustomImage() {
+    if (isCustomImage) {
+      return;
+    }
+    const fontColor = getDefaultFontColor('image');
+    update({ background: { type: 'image', url: '' }, titleColor: fontColor, counterColor: fontColor });
   }
 
   function handleSubmit(event: FormEvent) {
@@ -173,16 +197,57 @@ function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
             )}
 
             {background.type === 'image' && (
-              <TextField
-                label="Image URL"
-                type="url"
-                placeholder="https://example.com/beach.jpg"
-                value={background.url}
-                error={Boolean(imageUrlError)}
-                helperText={imageUrlError ?? ' '}
-                onChange={(event) => updateBackground({ url: event.target.value })}
-                slotProps={{ htmlInput: { maxLength: IMAGE_URL_MAX_LENGTH } }}
-              />
+              <>
+                <Box role="group" aria-label="Image presets" sx={{ display: 'grid', gap: 1, gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                  {IMAGE_PRESETS.map((preset) => (
+                    <ToggleButton
+                      key={preset.name}
+                      value={preset.name}
+                      color="primary"
+                      size="small"
+                      selected={selectedImagePreset === preset}
+                      onChange={() => applyImagePreset(preset)}
+                      sx={{ gap: 1, justifyContent: 'flex-start', minWidth: 0 }}
+                    >
+                      <Box
+                        component="img"
+                        src={preset.asset}
+                        alt=""
+                        aria-hidden
+                        sx={{ width: 20, height: 20, borderRadius: 0.5, flexShrink: 0, objectFit: 'cover' }}
+                      />
+                      <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {preset.name}
+                      </Box>
+                    </ToggleButton>
+                  ))}
+                  <ToggleButton
+                    value="custom"
+                    color="primary"
+                    size="small"
+                    selected={isCustomImage}
+                    onChange={switchToCustomImage}
+                    sx={{ gap: 1, justifyContent: 'flex-start', minWidth: 0 }}
+                  >
+                    <AddPhotoAlternateRoundedIcon aria-hidden sx={{ width: 20, height: 20, flexShrink: 0 }} />
+                    <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      Custom
+                    </Box>
+                  </ToggleButton>
+                </Box>
+                {isCustomImage && (
+                  <TextField
+                    label="Image URL"
+                    type="url"
+                    placeholder="https://example.com/beach.jpg"
+                    value={background.url}
+                    error={Boolean(imageUrlError)}
+                    helperText={imageUrlError ?? ' '}
+                    onChange={(event) => updateBackground({ url: event.target.value })}
+                    slotProps={{ htmlInput: { maxLength: IMAGE_URL_MAX_LENGTH } }}
+                  />
+                )}
+              </>
             )}
           </Stack>
 
