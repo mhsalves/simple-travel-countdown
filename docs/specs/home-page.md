@@ -24,8 +24,8 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
 | Title        | Text, up to 60 characters    | Empty                           | Preview shows "Your trip title" when empty |
 | Finish date  | Date and time (local time)   | 30 days from now at 09:00       |                                          |
 | Background   | Solid color, gradient or image | Ocean preset ([Style guide](style-guide.md#14-countdown-background-presets)) | Gradient uses two colors; image uses an `http(s)` URL |
-| Title color  | Color picker                 | `#ffffff`                       |                                          |
-| Counter color | Color picker                | `#ffffff`                       | Applies to the numbers and their labels  |
+| Title color  | Color picker                 | Preset font color (`#FFFFFF`)   | Reset to the preset/background default when the background changes |
+| Counter color | Color picker                | Preset font color (`#FFFFFF`)   | Applies to the numbers and their labels; reset like the title color |
 
 ### Preview
 

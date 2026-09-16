@@ -1,17 +1,22 @@
+import Stack from '@mui/material/Stack';
+import Typography, { TypographyProps } from '@mui/material/Typography';
 import Logo from './Logo';
 
 const APP_NAME = 'Travel Countdown';
 
 interface BrandProps {
-  size?: number;
+  size: number;
+  nameSx?: TypographyProps['sx'];
 }
 
-function Brand({ size }: BrandProps) {
+function Brand({ size, nameSx }: BrandProps) {
   return (
-    <span className="brand">
+    <Stack direction="row" sx={{ alignItems: 'center', gap: `${Math.round(size / 3)}px` }}>
       <Logo size={size} />
-      <span className="brand__name">{APP_NAME}</span>
-    </span>
+      <Typography variant="subtitle1" component="span" sx={nameSx}>
+        {APP_NAME}
+      </Typography>
+    </Stack>
   );
 }
 

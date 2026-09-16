@@ -1,4 +1,5 @@
 import { CSSProperties } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
 
 export const TITLE_MAX_LENGTH = 60;
 
@@ -11,43 +12,56 @@ export type BackgroundType = Background['type'];
 
 export interface CountdownConfig {
   title: string;
-  finishDate: string;
+  finishDate: Dayjs | null;
   background: Background;
   titleColor: string;
   counterColor: string;
 }
 
-function toDateTimeLocalValue(date: Date): string {
-  const pad = (value: number) => String(value).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+export interface GradientPreset {
+  name: string;
+  from: string;
+  to: string;
+  fontColor: string;
 }
 
-export function createDefaultConfig(): CountdownConfig {
-  const finishDate = new Date();
-  finishDate.setDate(finishDate.getDate() + 30);
-  finishDate.setHours(9, 0, 0, 0);
+// Presets from docs/specs/style-guide.md (1.4 Countdown background presets).
+export const GRADIENT_PRESETS: GradientPreset[] = [
+  { name: 'Ocean', from: '#0B6E99', to: '#0A7A94', fontColor: '#FFFFFF' },
+  { name: 'Sunset', from: '#F4845F', to: '#F7C35F', fontColor: '#1F2A33' },
+  { name: 'Palm', from: '#1E7A4F', to: '#0F6B6B', fontColor: '#FFFFFF' },
+  { name: 'Night', from: '#0E1620', to: '#2B4A66', fontColor: '#FFFFFF' },
+];
 
+const [DEFAULT_PRESET] = GRADIENT_PRESETS;
+const IMAGE_FONT_COLOR = '#FFFFFF';
+
+export function createDefaultConfig(): CountdownConfig {
   return {
     title: '',
-    finishDate: toDateTimeLocalValue(finishDate),
-    background: { type: 'gradient', from: '#1f6feb', to: '#7c3aed' },
-    titleColor: '#ffffff',
-    counterColor: '#ffffff',
+    finishDate: dayjs().add(30, 'day').hour(9).minute(0).second(0).millisecond(0),
+    background: { type: 'gradient', from: DEFAULT_PRESET.from, to: DEFAULT_PRESET.to },
+    titleColor: DEFAULT_PRESET.fontColor,
+    counterColor: DEFAULT_PRESET.fontColor,
   };
 }
 
 export function createBackground(type: BackgroundType): Background {
   switch (type) {
     case 'solid':
-      return { type, color: '#1f6feb' };
+      return { type, color: DEFAULT_PRESET.from };
     case 'gradient':
-      return { type, from: '#1f6feb', to: '#7c3aed' };
+      return { type, from: DEFAULT_PRESET.from, to: DEFAULT_PRESET.to };
     case 'image':
       return { type, url: '' };
   }
 }
 
-function isHttpUrl(value: string): boolean {
+export function getDefaultFontColor(type: BackgroundType): string {
+  return type === 'image' ? IMAGE_FONT_COLOR : DEFAULT_PRESET.fontColor;
+}
+
+export function isHttpUrl(value: string): boolean {
   try {
     const { protocol } = new URL(value);
     return protocol === 'http:' || protocol === 'https:';
@@ -56,7 +70,7 @@ function isHttpUrl(value: string): boolean {
   }
 }
 
-const FALLBACK_BACKGROUND = '#1b2230';
+const FALLBACK_BACKGROUND = '#1F2A33';
 
 export function getBackgroundStyle(background: Background): CSSProperties {
   switch (background.type) {

@@ -60,7 +60,7 @@ The app follows the operating system preference (`prefers-color-scheme`) and use
 
 ## 2. Typography
 
-One typeface keeps the interface simple: **[Inter](https://rsms.me/inter/)**, self-hosted through `@fontsource-variable/inter` so it works offline and on GitHub Pages. Fallback stack: `Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
+One typeface keeps the interface simple: **[Inter](https://rsms.me/inter/)**, self-hosted through `@fontsource-variable/inter` so it works offline and on GitHub Pages. Font stack: `"Inter Variable", Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
 
 ### 2.1 Type scale
 
@@ -115,8 +115,9 @@ A single theme created with `createTheme` and applied with `ThemeProvider` + `Cs
 | Form container        | `Card` (`variant="outlined"`) + `CardContent`     | Padding 24px                                              |
 | Title                 | `TextField`                                       | `slotProps.htmlInput.maxLength = 60`, helper text shows `n/60` |
 | Finish date           | `DateTimePicker` (`@mui/x-date-pickers`, `AdapterDayjs`) | `disablePast`, `ampm` follows locale              |
-| Background type       | `ToggleButtonGroup` (`exclusive`, `fullWidth`)    | Options: Solid color, Gradient, Image, plus presets from 1.4 |
-| Background / font colors | `TextField` with a native color swatch in `InputAdornment` | Displays the hex value; label names the target (Start, End, Title, Counter) |
+| Background type       | `ToggleButtonGroup` (`exclusive`, `fullWidth`)    | Options: Solid color, Gradient, Image                    |
+| Gradient presets      | `ToggleButton` grid (2 columns on mobile, 4 from `sm`) | Presets from 1.4 with a gradient swatch; selecting one also sets both font colors to its recommended color |
+| Background / font colors | `TextField` with a native color swatch in `InputAdornment` | Editable hex value (invalid values are flagged and reverted on blur); labels: Background color, Start color, End color, Title color, Counter color |
 | Image URL             | `TextField` (`type="url"`)                        | `error` + `helperText` when the URL is not `http(s)`     |
 | Generate link         | `Button` (`variant="contained"`, `size="large"`, `fullWidth`) | Primary color                              |
 | Field groups          | `Stack` (`spacing={2.5}`) and `FormLabel`         |                                                          |

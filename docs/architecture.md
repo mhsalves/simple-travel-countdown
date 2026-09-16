@@ -10,7 +10,7 @@ The project is an npm workspaces monorepo with two packages.
 │   ├── src/
 │   │   ├── main.tsx     App entry point
 │   │   ├── App.tsx      Root component
-│   │   ├── index.css    Global styles and theme tokens
+│   │   ├── theme.ts     Material UI theme (style guide tokens)
 │   │   ├── components/  Shared layout components (header, footer, logo)
 │   │   ├── pages/       Page components
 │   │   └── countdown/   Countdown configuration, timer, form and display

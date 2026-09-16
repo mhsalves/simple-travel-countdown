@@ -1,12 +1,14 @@
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Brand from './Brand';
 
 function Header() {
   return (
-    <header className="site-header">
-      <div className="container">
-        <Brand />
-      </div>
-    </header>
+    <Box component="header" sx={{ py: 2, bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
+      <Container>
+        <Brand size={32} />
+      </Container>
+    </Box>
   );
 }
 

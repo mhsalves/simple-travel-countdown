@@ -1,3 +1,6 @@
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import { CountdownConfig, getBackgroundStyle } from './config';
 import { getTimeLeft, useNow } from './timeLeft';
 
@@ -9,9 +12,8 @@ interface CountdownProps {
 
 function Countdown({ config }: CountdownProps) {
   const now = useNow();
-  const target = new Date(config.finishDate);
-  const hasDate = !Number.isNaN(target.getTime());
-  const timeLeft = getTimeLeft(hasDate ? target : new Date(now), now);
+  const target = config.finishDate?.isValid() ? config.finishDate.toDate() : null;
+  const timeLeft = getTimeLeft(target ?? new Date(now), now);
 
   const units = [
     { label: 'Days', value: timeLeft.days },
@@ -21,31 +23,52 @@ function Countdown({ config }: CountdownProps) {
   ];
 
   let status = '';
-  if (!hasDate) {
+  if (!target) {
     status = 'Choose a finish date';
   } else if (timeLeft.finished) {
     status = 'The countdown has finished';
   }
 
   return (
-    <div className="countdown" style={getBackgroundStyle(config.background)}>
-      <h2 className="countdown__title" style={{ color: config.titleColor }}>
+    <Stack
+      spacing={3}
+      sx={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 360,
+        px: 2,
+        py: 5,
+        borderRadius: '12px',
+        textAlign: 'center',
+      }}
+      style={getBackgroundStyle(config.background)}
+    >
+      <Typography
+        variant="h2"
+        component="p"
+        sx={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', fontWeight: 700, lineHeight: 1.2, overflowWrap: 'anywhere' }}
+        style={{ color: config.titleColor }}
+      >
         {config.title.trim() || TITLE_PLACEHOLDER}
-      </h2>
-      <div className="countdown__units" style={{ color: config.counterColor }} role="timer" aria-live="off">
+      </Typography>
+
+      <Stack direction="row" role="timer" sx={{ gap: 'clamp(12px, 4vw, 32px)' }} style={{ color: config.counterColor }}>
         {units.map(({ label, value }) => (
-          <div key={label} className="countdown__unit">
-            <span className="countdown__value">{String(value).padStart(2, '0')}</span>
-            <span className="countdown__label">{label}</span>
-          </div>
+          <Stack key={label} sx={{ alignItems: 'center' }}>
+            <Typography variant="countdownValue">{String(value).padStart(2, '0')}</Typography>
+            <Typography variant="overline" sx={{ opacity: 0.85 }}>
+              {label}
+            </Typography>
+          </Stack>
         ))}
-      </div>
+      </Stack>
+
       {status && (
-        <p className="countdown__status" style={{ color: config.counterColor }}>
+        <Box component="p" sx={{ m: 0, fontWeight: 600 }} style={{ color: config.counterColor }}>
           {status}
-        </p>
+        </Box>
       )}
-    </div>
+    </Stack>
   );
 }
 

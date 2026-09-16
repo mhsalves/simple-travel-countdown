@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Countdown from '../countdown/Countdown';
@@ -9,24 +12,38 @@ function Home() {
   const [config, setConfig] = useState(createDefaultConfig);
 
   return (
-    <div className="page">
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header />
-      <main className="container home">
-        <section className="home__form" aria-labelledby="form-title">
-          <h1 id="form-title" className="section-title">
+      <Container
+        component="main"
+        sx={{
+          display: 'grid',
+          gap: 3,
+          pt: 4,
+          pb: 6,
+          gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 2fr) minmax(0, 3fr)' },
+          alignItems: 'start',
+        }}
+      >
+        <Box component="section" aria-labelledby="form-title">
+          <Typography variant="h1" id="form-title" sx={{ mb: 1.5 }}>
             Create your countdown
-          </h1>
+          </Typography>
           <CountdownForm config={config} onChange={setConfig} />
-        </section>
-        <section className="home__preview" aria-labelledby="preview-title">
-          <h2 id="preview-title" className="section-title">
+        </Box>
+        <Box
+          component="section"
+          aria-labelledby="preview-title"
+          sx={{ order: { xs: -1, md: 0 }, position: { md: 'sticky' }, top: { md: 24 } }}
+        >
+          <Typography variant="h2" id="preview-title" sx={{ mb: 1.5 }}>
             Preview
-          </h2>
+          </Typography>
           <Countdown config={config} />
-        </section>
-      </main>
+        </Box>
+      </Container>
       <Footer />
-    </div>
+    </Box>
   );
 }
 
