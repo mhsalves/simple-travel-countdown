@@ -54,6 +54,16 @@ Presets offered by the background option of the countdown form. **Ocean** is the
 
 Image backgrounds receive a `rgba(0, 0, 0, 0.4)` overlay and default to white text.
 
+Bundled image presets, plus a "Custom" option for a manual URL. All three use white text: measuring contrast at the image's whole-frame average favors dark text for the two lighter photos, but the title and counter sit centered over busy, mixed-tone illustration there, and measuring contrast in that specific region (with the overlay applied) shows white keeps a higher worst-case contrast on all three:
+
+| Preset    | Photo                                                       | Font color |
+| --------- | ------------------------------------------------------------ | ----------- |
+| New Year  | `client/src/assets/backgrounds/happy-new-year.jpg`            | `#FFFFFF`    |
+| Birthday  | `client/src/assets/backgrounds/happy-birthday.jpg`            | `#FFFFFF`    |
+| Orlando   | `client/src/assets/backgrounds/orlando-park.jpg`              | `#FFFFFF`    |
+
+Selecting a preset sets both the image URL and both font colors, same as a gradient preset, and the manual URL field is hidden. Selecting **Custom** clears the URL and shows the field again for a manual `http(s)` link.
+
 ### 1.5 Theme mode
 
 The app follows the operating system preference (`prefers-color-scheme`) and uses the Light or Dark column accordingly. The countdown preview and countdown view always use the user's chosen background and font colors, regardless of theme mode.
@@ -118,7 +128,8 @@ A single theme created with `createTheme` and applied with `ThemeProvider` + `Cs
 | Background type       | `ToggleButtonGroup` (`exclusive`, `fullWidth`)    | Options: Solid color, Gradient, Image                    |
 | Gradient presets      | `ToggleButton` grid (2 columns on mobile, 4 from `sm`) | Presets from 1.4 with a gradient swatch; selecting one also sets both font colors to its recommended color |
 | Background / font colors | `TextField` with a native color swatch in `InputAdornment` | Editable hex value (invalid values are flagged and reverted on blur); labels: Background color, Start color, End color, Title color, Counter color |
-| Image URL             | `TextField` (`type="url"`)                        | `error` + `helperText` when the URL is not `http(s)`     |
+| Image presets         | `ToggleButton` grid (2 columns; names are too long for 4) | Presets from 1.4 with a photo thumbnail, plus a "Custom" option (`AddPhotoAlternateRounded` icon); selecting a preset sets the Image URL (resolved from the bundled asset) and both font colors, and hides the Image URL field; selecting Custom clears the URL and shows the field again |
+| Image URL             | `TextField` (`type="url"`)                        | Shown only when Custom is selected; `error` + `helperText` when the URL is not `http(s)` |
 | Generate link         | `Button` (`type="submit"`, `variant="contained"`, `size="large"`, `fullWidth`) | Primary color              |
 | Field errors          | `error` + `helperText` on the field               | Shown after the first generate attempt; the title counter is replaced by its error |
 | Link success          | `Dialog` (`maxWidth="sm"`, `fullWidth`)           | `DialogTitle` with `CheckCircleRounded` in `success` color; read-only `TextField` with the link |
