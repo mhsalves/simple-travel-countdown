@@ -8,7 +8,10 @@ The project is an npm workspaces monorepo with two packages.
 │   ├── index.html
 │   ├── src/
 │   │   ├── main.tsx     App entry point
-│   │   └── App.tsx      Root component
+│   │   ├── App.tsx      Root component
+│   │   ├── index.css    Global styles and theme tokens
+│   │   ├── pages/       Page components
+│   │   └── countdown/   Countdown link helpers
 │   └── vite.config.ts
 ├── server/              Node.js + Express + TypeScript API
 │   └── src/
@@ -31,7 +34,7 @@ The project is an npm workspaces monorepo with two packages.
 
 ## Pages
 
-| Page            | Status  | Description                                                |
-| --------------- | ------- | ---------------------------------------------------------- |
-| Home            | Initial | Hello World placeholder; will create countdown links       |
-| Countdown view  | Planned | Displays the counter according to the link's configuration |
+| Page            | Status  | Description                                                 |
+| --------------- | ------- | ----------------------------------------------------------- |
+| Home            | Done    | Form to create a countdown link (see [Countdown links](countdown-links.md)) |
+| Countdown view  | Planned | Displays the counter according to the link's configuration  |
