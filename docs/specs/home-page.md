@@ -1,5 +1,7 @@
 # Home page specification
 
+Visual definitions (colors, typography, form components, logo) are in the [Style guide](style-guide.md).
+
 ## Requirements
 
 - **Header**: simple header with the logo and the feature name "Travel Countdown".
@@ -21,7 +23,7 @@
 | ------------ | ---------------------------- | ------------------------------- | ---------------------------------------- |
 | Title        | Text, up to 60 characters    | Empty                           | Preview shows "Your trip title" when empty |
 | Finish date  | Date and time (local time)   | 30 days from now at 09:00       |                                          |
-| Background   | Solid color, gradient or image | Gradient `#1f6feb` → `#7c3aed` | Gradient uses two colors; image uses an `http(s)` URL |
+| Background   | Solid color, gradient or image | Ocean preset ([Style guide](style-guide.md#14-countdown-background-presets)) | Gradient uses two colors; image uses an `http(s)` URL |
 | Title color  | Color picker                 | `#ffffff`                       |                                          |
 | Counter color | Color picker                | `#ffffff`                       | Applies to the numbers and their labels  |
 
