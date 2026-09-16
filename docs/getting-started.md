@@ -19,7 +19,7 @@ Run from the project root:
 
 | Script              | Description                                                        |
 | ------------------- | ------------------------------------------------------------------ |
-| `npm run dev`       | Starts the server (port 3001) and the client dev server (port 5173) |
+| `npm run dev`       | Starts the client dev server (port 3029) and the server (port 3030) |
 | `npm run build`     | Builds the client to `client/dist` and the server to `server/dist`  |
 | `npm start`         | Runs the compiled server                                            |
 | `npm run typecheck` | Type-checks both workspaces                                         |
@@ -30,7 +30,7 @@ Run from the project root:
 npm run dev
 ```
 
-Open http://localhost:5173. Requests to `/api/*` are proxied to the server on port 3001.
+Open http://localhost:3029. Requests to `/api/*` are proxied to the server on port 3030.
 
 ## Production
 
@@ -39,11 +39,11 @@ npm run build
 NODE_ENV=production npm start
 ```
 
-Open http://localhost:3001. In production the server also serves the built client.
+Open http://localhost:3029. In production the server also serves the built client.
 
 ## Environment variables
 
 | Variable   | Default | Description                                     |
 | ---------- | ------- | ----------------------------------------------- |
-| `PORT`     | `3001`  | Server port                                     |
+| `PORT`     | `3029`  | Server port (`npm run dev` sets it to `3030`)   |
 | `NODE_ENV` | —       | Set to `production` to serve the built client   |
