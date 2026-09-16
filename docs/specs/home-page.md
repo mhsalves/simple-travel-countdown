@@ -13,7 +13,7 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
     - Custom font colors
   - **Preview** that displays the countdown in real time, applying every option set in the form.
   - A **Generate link** button. Its action is not implemented yet and will be specified later.
-- **Footer**: logo and name, "Developed by Matheus Alves" and the current year.
+- **Footer**: logo and name, "Developed by Matheus Alves" (linking to https://matheusalves.dev/ in a new tab) and the current year.
 
 ## Details
 

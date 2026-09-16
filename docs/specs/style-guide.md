@@ -165,7 +165,7 @@ The **lockup** is the mark followed by the name "Travel Countdown" in Inter 700,
 | Place                         | Version                  | Mark size | Name style                          |
 | ----------------------------- | ------------------------ | --------- | ----------------------------------- |
 | Header                        | Full color lockup        | 32px      | `subtitle1` 1.125rem, `text` color  |
-| Footer                        | Full color lockup        | 24px      | 0.875rem, `text-muted` color, followed by "Developed by Matheus Alves · year" |
+| Footer                        | Full color lockup        | 24px      | 0.875rem, `text-muted` color, followed by "Developed by Matheus Alves · year" ("Matheus Alves" is a `primary` link to https://matheusalves.dev/) |
 | Home — form                   | Not used                 | —         | —                                   |
 | Home — preview                | Not used (user content)  | —         | —                                   |
 | Countdown view (planned)      | Monochrome lockup, bottom corner | 20px | 0.75rem, counter font color at 80% opacity, links to the home page |
