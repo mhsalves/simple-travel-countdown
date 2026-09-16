@@ -12,7 +12,7 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
     - Background
     - Custom font colors
   - **Preview** that displays the countdown in real time, applying every option set in the form.
-  - A **Generate link** button. Its action is not implemented yet and will be specified later.
+  - A **Generate link** button that validates the form and creates the countdown link ([Countdown link specification](countdown-link.md)).
 - **Footer**: logo and name, "Developed by Matheus Alves" (linking to https://matheusalves.dev/ in a new tab) and the current year.
 
 ## Details
@@ -41,4 +41,5 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
 
 ### Generate link
 
-- The button is displayed below the form fields and has no action yet.
+- The button is displayed below the form fields.
+- Validation, link format and the success dialog follow the [Countdown link specification](countdown-link.md).

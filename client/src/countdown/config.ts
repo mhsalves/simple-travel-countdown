@@ -2,6 +2,9 @@ import { CSSProperties } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 
 export const TITLE_MAX_LENGTH = 60;
+export const IMAGE_URL_MAX_LENGTH = 1000;
+
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
 export type Background =
   | { type: 'solid'; color: string }
@@ -59,6 +62,10 @@ export function createBackground(type: BackgroundType): Background {
 
 export function getDefaultFontColor(type: BackgroundType): string {
   return type === 'image' ? IMAGE_FONT_COLOR : DEFAULT_PRESET.fontColor;
+}
+
+export function isHexColor(value: string): boolean {
+  return HEX_COLOR.test(value);
 }
 
 export function isHttpUrl(value: string): boolean {

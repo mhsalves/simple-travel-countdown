@@ -1,3 +1,4 @@
+import { FormEvent, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -15,11 +16,13 @@ import {
   CountdownConfig,
   GRADIENT_PRESETS,
   GradientPreset,
+  IMAGE_URL_MAX_LENGTH,
   TITLE_MAX_LENGTH,
   createBackground,
   getDefaultFontColor,
   isHttpUrl,
 } from './config';
+import { IMAGE_URL_ERROR, hasErrors, validateCountdownConfig } from './validation';
 
 const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
   { type: 'solid', label: 'Solid color' },
@@ -30,10 +33,13 @@ const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
 interface CountdownFormProps {
   config: CountdownConfig;
   onChange: (config: CountdownConfig) => void;
+  onGenerate: () => void;
 }
 
-function CountdownForm({ config, onChange }: CountdownFormProps) {
+function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
   const { background } = config;
+  const [submitted, setSubmitted] = useState(false);
+  const errors = submitted ? validateCountdownConfig(config) : {};
 
   function update(changes: Partial<CountdownConfig>) {
     onChange({ ...config, ...changes });
@@ -64,10 +70,20 @@ function CountdownForm({ config, onChange }: CountdownFormProps) {
     });
   }
 
-  const imageUrlInvalid = background.type === 'image' && background.url !== '' && !isHttpUrl(background.url);
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setSubmitted(true);
+    if (!hasErrors(validateCountdownConfig(config))) {
+      onGenerate();
+    }
+  }
+
+  const imageUrlError =
+    errors.imageUrl ??
+    (background.type === 'image' && background.url !== '' && !isHttpUrl(background.url) ? IMAGE_URL_ERROR : undefined);
 
   return (
-    <Card variant="outlined" component="form" onSubmit={(event: React.FormEvent) => event.preventDefault()}>
+    <Card variant="outlined" component="form" noValidate onSubmit={handleSubmit}>
       <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
         <Stack spacing={2.5}>
           <TextField
@@ -75,7 +91,8 @@ function CountdownForm({ config, onChange }: CountdownFormProps) {
             placeholder="Trip to Lisbon"
             value={config.title}
             onChange={(event) => update({ title: event.target.value })}
-            helperText={`${config.title.length}/${TITLE_MAX_LENGTH}`}
+            error={Boolean(errors.title)}
+            helperText={errors.title ?? `${config.title.length}/${TITLE_MAX_LENGTH}`}
             slotProps={{ htmlInput: { maxLength: TITLE_MAX_LENGTH } }}
           />
 
@@ -84,7 +101,13 @@ function CountdownForm({ config, onChange }: CountdownFormProps) {
             value={config.finishDate}
             onChange={(value) => update({ finishDate: value })}
             disablePast
-            slotProps={{ textField: { fullWidth: true } }}
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                error: errors.finishDate ? true : undefined,
+                helperText: errors.finishDate,
+              },
+            }}
           />
 
           <Stack spacing={1.5}>
@@ -155,9 +178,10 @@ function CountdownForm({ config, onChange }: CountdownFormProps) {
                 type="url"
                 placeholder="https://example.com/beach.jpg"
                 value={background.url}
-                error={imageUrlInvalid}
-                helperText={imageUrlInvalid ? 'Enter a URL starting with http:// or https://' : ' '}
+                error={Boolean(imageUrlError)}
+                helperText={imageUrlError ?? ' '}
                 onChange={(event) => updateBackground({ url: event.target.value })}
+                slotProps={{ htmlInput: { maxLength: IMAGE_URL_MAX_LENGTH } }}
               />
             )}
           </Stack>
@@ -174,7 +198,7 @@ function CountdownForm({ config, onChange }: CountdownFormProps) {
             </Stack>
           </Stack>
 
-          <Button type="button" variant="contained" size="large" fullWidth>
+          <Button type="submit" variant="contained" size="large" fullWidth>
             Generate link
           </Button>
         </Stack>
