@@ -6,14 +6,20 @@ The project is an npm workspaces monorepo with two packages.
 .
 ├── client/              React 17 + TypeScript app (Vite)
 │   ├── index.html
+│   ├── public/          Static files served as-is (favicons)
 │   ├── src/
 │   │   ├── main.tsx     App entry point
-│   │   └── App.tsx      Root component
+│   │   ├── App.tsx      Root component
+│   │   ├── theme.ts     Material UI theme (style guide tokens)
+│   │   ├── components/  Shared layout components (header, footer, logo)
+│   │   ├── pages/       Page components
+│   │   └── countdown/   Countdown configuration, timer, form and display
 │   └── vite.config.ts
 ├── server/              Node.js + Express + TypeScript API
 │   └── src/
 │       └── index.ts     Server entry point
 ├── docs/                Project documentation
+│   └── specs/           Feature specifications
 ├── package.json         Workspaces and root scripts
 └── tsconfig.base.json   Shared TypeScript options
 ```
@@ -31,7 +37,7 @@ The project is an npm workspaces monorepo with two packages.
 
 ## Pages
 
-| Page            | Status  | Description                                                |
-| --------------- | ------- | ---------------------------------------------------------- |
-| Home            | Initial | Hello World placeholder; will create countdown links       |
-| Countdown view  | Planned | Displays the counter according to the link's configuration |
+| Page           | Status      | Description                                                                 |
+| -------------- | ----------- | --------------------------------------------------------------------------- |
+| Home           | In progress | Countdown form with live preview; link generation pending ([spec](specs/home-page.md)) |
+| Countdown view | Planned     | Displays the counter according to the link's configuration                  |
