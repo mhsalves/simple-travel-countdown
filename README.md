@@ -15,3 +15,4 @@ npm run dev
 
 - [Getting started](docs/getting-started.md) — requirements, scripts and running the project
 - [Architecture](docs/architecture.md) — project structure and how client and server fit together
+- [Deployment](docs/deployment.md) — GitHub Pages deploy from `main`
