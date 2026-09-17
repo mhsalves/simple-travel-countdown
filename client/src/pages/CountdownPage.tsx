@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from '../i18n/I18nProvider';
@@ -29,16 +28,14 @@ function CreateCountdownButton() {
 // icon-only, so the header keeps the language selector on one line.
 function EditCountdownButton({ token, compact }: { token: string; compact: boolean }) {
   const { t } = useTranslation();
-  const label = t('action.editCountdown');
   return (
     <Button
       component="a"
       href={`${import.meta.env.BASE_URL}?edit=${token}`}
       variant="text"
-      aria-label={compact ? label : undefined}
       sx={{ flexShrink: 0, px: compact ? 1 : 1.5, minWidth: 0, whiteSpace: 'nowrap' }}
     >
-      {compact ? <EditRoundedIcon /> : label}
+      {compact ? t('action.edit') : t('action.editCountdown')}
     </Button>
   );
 }

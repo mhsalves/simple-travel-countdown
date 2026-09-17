@@ -25,7 +25,7 @@ Visual definitions (colors, typography, logo) are in the [Style guide](style-gui
 | **Edit countdown**   | `text` (less prominent)                  | Link to `<base URL>?edit=<token>`, which opens the home form with this countdown loaded |
 | **Share**            | `contained`, primary, share icon (more prominent) | Opens the share modal for the countdown being viewed ([Share action specification](share-action.md)), with the page's own URL as the link and the image rendered from the token's configuration |
 
-Below the `sm` breakpoint both actions are icon-only (pencil and share icons, with the same accessible names) and the brand name is hidden, keeping the header on one line down to 320px and with enlarged text. The brand name returns from `md`, where there is room for it next to the actions.
+Below the `sm` breakpoint the edit action shows the short label **Edit**, the share action is icon-only (share icon with its accessible name) and the brand name is hidden, keeping the header on one line down to 320px and with enlarged text. The brand name returns from `md`, where there is room for it next to the actions.
 
 ### Invalid token
 
