@@ -1,25 +1,44 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
 import Header from '../components/Header';
 import Countdown from '../countdown/Countdown';
+import ShareDialog from '../countdown/ShareDialog';
 import { decodeCountdownToken } from '../countdown/link';
 
 interface CountdownPageProps {
   token: string;
 }
 
-function CreateCountdownButton() {
+function CreateCountdownButton({ variant = 'contained' }: { variant?: 'contained' | 'text' }) {
+  const inHeader = variant === 'text';
   return (
-    <Button component="a" href={import.meta.env.BASE_URL} variant="contained" size="large">
-      Create my countdown
+    <Button
+      component="a"
+      href={import.meta.env.BASE_URL}
+      variant={variant}
+      size={inHeader ? 'medium' : 'large'}
+      sx={inHeader ? { flexShrink: 0, px: 1.5 } : undefined}
+    >
+      Create
+      <Box component="span" sx={inHeader ? { display: { xs: 'none', sm: 'inline' }, pl: 0.5 } : { pl: 0.5 }}>
+        my countdown
+      </Box>
     </Button>
   );
 }
 
 function CountdownPage({ token }: CountdownPageProps) {
   const config = useMemo(() => decodeCountdownToken(token), [token]);
+  const [share, setShare] = useState<{ id: number; generatedAt: Date } | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  function handleShare() {
+    setShare((previous) => ({ id: (previous?.id ?? 0) + 1, generatedAt: new Date() }));
+    setDialogOpen(true);
+  }
 
   if (!config) {
     return (
@@ -54,16 +73,29 @@ function CountdownPage({ token }: CountdownPageProps) {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header />
+      <Header
+        actions={
+          <>
+            <Button variant="contained" startIcon={<ShareRoundedIcon />} onClick={handleShare} sx={{ flexShrink: 0 }}>
+              Share
+            </Button>
+            <CreateCountdownButton variant="text" />
+          </>
+        }
+      />
       <Box component="main" sx={{ flex: 1, display: 'flex' }}>
         <Countdown config={config} variant="page" />
       </Box>
-      <Box
-        component="footer"
-        sx={{ py: 2.5, textAlign: 'center', borderTop: 1, borderColor: 'divider', bgcolor: 'background.paper' }}
-      >
-        <CreateCountdownButton />
-      </Box>
+      {share && (
+        <ShareDialog
+          key={share.id}
+          open={dialogOpen}
+          link={window.location.href}
+          config={config}
+          generatedAt={share.generatedAt}
+          onClose={() => setDialogOpen(false)}
+        />
+      )}
     </Box>
   );
 }
