@@ -40,4 +40,4 @@ The project is an npm workspaces monorepo with two packages.
 | Page           | Status      | Description                                                                 |
 | -------------- | ----------- | --------------------------------------------------------------------------- |
 | Home           | Done        | Countdown form with live preview and link generation ([spec](specs/home-page.md), [link rules](specs/countdown-link.md)) |
-| Countdown view | Planned     | Displays the counter according to the link's configuration                  |
+| Countdown view | Done        | Displays the counter according to the link's configuration ([spec](specs/countdown-page.md)) |

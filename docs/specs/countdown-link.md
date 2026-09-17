@@ -110,4 +110,4 @@ Each generation creates the link from the current form values and resets the cop
 | Form validation             | `client/src/countdown/validation.ts`  |
 | Success dialog              | `client/src/countdown/LinkDialog.tsx` |
 
-The page that reads the token and displays the countdown is not part of this specification.
+The page that reads the token and displays the countdown is described in the [Countdown page specification](countdown-page.md).
