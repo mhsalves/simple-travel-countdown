@@ -76,10 +76,10 @@ function CountdownPage({ token }: CountdownPageProps) {
       <Header
         actions={
           <>
+            <CreateCountdownButton variant="text" />
             <Button variant="contained" startIcon={<ShareRoundedIcon />} onClick={handleShare} sx={{ flexShrink: 0 }}>
               Share
             </Button>
-            <CreateCountdownButton variant="text" />
           </>
         }
       />
