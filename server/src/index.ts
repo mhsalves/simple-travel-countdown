@@ -1,7 +1,7 @@
 import path from 'path';
 import express from 'express';
 
-const PORT = Number(process.env.PORT) || 3009;
+const PORT = Number(process.env.PORT) || 3029;
 const CLIENT_DIST = path.resolve(__dirname, '../../client/dist');
 
 const app = express();
