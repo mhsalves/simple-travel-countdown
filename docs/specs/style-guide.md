@@ -137,7 +137,8 @@ A single theme created with `createTheme` and applied with `ThemeProvider` + `Cs
 | Share link            | Small read-only `TextField` + `outlined` **Copy** `Button` | After copying: `success` color, `CheckRounded` icon and "Copied" |
 | Image orientation     | `ToggleButtonGroup` (`exclusive`, `fullWidth`)    | `CropLandscapeRounded` Landscape, `CropPortraitRounded` Vertical |
 | Image preview         | `img` in a 280px `background.default` box with `divider` border | `CircularProgress` while rendering; 6px radius and `boxShadow: 2` on the image |
-| Share targets         | `contained` `Button`s in a grid (1 column below `sm`) | `WhatsApp`, `Telegram` and `ShareRounded` (Other, mobile only) icons |
+| Share targets (web)   | `ToggleButtonGroup` (`exclusive`, `fullWidth`)    | `WhatsApp`, `Telegram` and `ShareRounded` (Other) icons; hidden on mobile |
+| Share steps           | Numbered list (`ol`, `body2`) in a `background.default` box with `divider` border | Optional `text.secondary` note; `contained` full-width action button with the target icon |
 | Share feedback        | `Alert` (`success` / `error`), dismissible        | Below the share targets |
 | Copy link             | `Button` (`variant="contained"`)                  | `ContentCopyRounded` icon; after copying: `success` color, `CheckRounded` icon and "Copied" |
 | Copy failure          | `Alert` (`severity="error"`)                      | Inside the dialog, below the link                        |

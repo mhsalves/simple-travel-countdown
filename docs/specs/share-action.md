@@ -8,7 +8,7 @@ How a countdown is shared from the home page: the share triggers, the share moda
 - The action opens a modal with:
   - The generated link with a copy action.
   - A screenshot of the preview as a **landscape** or **vertical** image; the user chooses which one to share.
-  - Share targets: **WhatsApp**, **Telegram** and **Other** (the device's native share, displayed only on mobile).
+  - Share targets: on web, **WhatsApp**, **Telegram** and **Other** (native share); on mobile, native share only.
 - A share sends the chosen image and the generated link.
 - The image follows the preview format, with a small, subtle application watermark on the right baseline and the generation date and time (`dd/mm/yyyy hh:mm`) on the left baseline.
 
@@ -45,32 +45,56 @@ Both orientations are rendered when the modal opens, so switching is instant and
 
 ### 3.3 Share targets
 
-WhatsApp and Telegram share links (`wa.me`, `web.whatsapp.com/send`, `t.me/share/url`) only accept text, and web pages have no API to attach a file to a specific app. The image is attached in the closest way each device allows:
+Share targets appear once the chosen image is rendered and depend on the device (**mobile** detection below).
 
-| Target       | Visible | Mobile with file sharing (Web Share API)                                  | Desktop, or mobile without file sharing |
-| ------------ | ------- | -------------------------------------------------------------------------- | --------------------------------------- |
-| **WhatsApp** | Always  | Native share sheet with the image file and the message; choosing WhatsApp sends the image **attached** with the link | Copies the image to the clipboard and opens `https://web.whatsapp.com/send?text=<message>` (desktop) or `https://wa.me/?text=<message>` (mobile); the user pastes the image into the chat to attach it |
-| **Telegram** | Always  | Same native share sheet; choosing Telegram sends the image attached with the link | Copies the image to the clipboard and opens `https://t.me/share/url?url=<link>&text=<text>`; the user pastes the image into the chat |
-| **Other**    | Mobile with file sharing only | Native share sheet with the image file and the message | Hidden |
+#### Web (desktop)
 
-If the browser cannot write images to the clipboard, the image is downloaded instead so it can be attached manually. Share targets are disabled until the chosen image is rendered.
+A toggle offers **WhatsApp**, **Telegram** and **Other**. Nothing happens until a target is chosen; choosing one shows numbered steps explaining exactly what will happen, followed by a button that performs those steps. The steps follow the chosen orientation.
 
-A caption below the targets explains what will happen on the current device:
+WhatsApp and Telegram web share links (`web.whatsapp.com/send`, `t.me/share/url`) only accept text, and web pages have no API to attach a file to a specific app, so the image is handed over through the clipboard or a download:
 
-| Case                          | Caption                                                                                           |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- |
-| Mobile with file sharing      | "Choose WhatsApp or Telegram in the share options to send the image attached with the link."      |
-| Clipboard image supported     | "The image is copied so you can paste it into the chat, with the message and link already filled in." |
-| Otherwise                     | "The image is downloaded so you can attach it to the chat, with the message and link already filled in." |
+| Target / case | Steps shown | Button | Action |
+| ------------- | ----------- | ------ | ------ |
+| WhatsApp or Telegram, clipboard image copy allowed | 1. The `<orientation>` image is copied to your clipboard. 2. `<App>` opens in a new tab with a message containing the countdown link. 3. Choose a chat and paste the image (⌘V / Ctrl+V) to attach it. | **Copy image and open `<App>`** | Copies the PNG to the clipboard, opens the app share URL |
+| WhatsApp or Telegram, clipboard image copy not allowed | 1. Your browser can't copy images, so the `<orientation>` image is downloaded to your computer as `<file name>`. 2. `<App>` opens in a new tab with a message containing the countdown link. 3. Choose a chat and attach the downloaded image. | **Download image and open `<App>`** | Downloads the PNG, opens the app share URL |
+| Other | See [Native sharing](#native-sharing) | | |
 
-| Outcome                                      | Feedback                                                                         |
-| -------------------------------------------- | -------------------------------------------------------------------------------- |
-| Native share completed                       | Success alert "Countdown shared"                                                 |
-| Native share cancelled (`AbortError`)        | None                                                                             |
-| Native share failed                          | Error alert "Couldn’t open the share options. Try again or copy the link."      |
-| Image copied, app opened                     | Success alert "Image copied. Paste it into the <app> chat (⌘V / Ctrl+V) to attach it to the message." |
-| Image downloaded, app opened                 | Success alert "Image downloaded. Attach it to your <app> message with the link." |
-| Pop-up blocked                               | Same alert, with an **Open <app>** button linking to the share URL              |
+Clipboard image copy is **allowed** when the browser supports `ClipboardItem` and `navigator.clipboard.write`, `ClipboardItem.supports('image/png')` is not false, and the `clipboard-write` permission is not `denied` (browsers without that permission query decide on write). If copying still fails when the button is pressed, the image is downloaded instead and the feedback says so.
+
+App share URLs:
+
+| App      | URL                                                             |
+| -------- | --------------------------------------------------------------- |
+| WhatsApp | `https://web.whatsapp.com/send?text=<message>`                  |
+| Telegram | `https://t.me/share/url?url=<link>&text=Countdown to <title>`   |
+
+#### Mobile
+
+No WhatsApp or Telegram buttons: only [Native sharing](#native-sharing) is offered, with its steps shown directly (no toggle). WhatsApp, Telegram and any other app are chosen from the phone's share options.
+
+#### Native sharing
+
+Uses the [Web Share API](https://developer.mozilla.org/docs/Web/API/Navigator/share) on both web and mobile. It always tries to share the image **and** the message with the link:
+
+| Browser support | Steps shown | Button | `navigator.share` data |
+| --------------- | ----------- | ------ | ---------------------- |
+| Files (`navigator.canShare({ files })`) | 1. Your phone's / system's share options open with the `<orientation>` image and a message containing the countdown link. 2. Choose WhatsApp, Telegram or any other app to send them. Note: some apps keep only the image and drop the message; if the link is missing, copy it above and paste it in the chat. | **Share image and link** | `title`, `text` (message with link), `files` (PNG) |
+| Text only | 1. Your browser can share the link but not images. 2. Your phone's / system's share options open with a message containing the countdown link, without the image. | **Share link** | `title`, `text` |
+| None | Mobile: "Your browser doesn't support sharing. Copy the link above and paste it in any app." Web: "Your browser doesn't support system sharing. Use WhatsApp, Telegram or copy the link above." | None | — |
+
+What the receiving app does with the shared data is up to the app: the page passes the image and the message together, but some apps may keep only one of them.
+
+#### Feedback
+
+| Outcome                               | Feedback                                                                         |
+| ------------------------------------- | -------------------------------------------------------------------------------- |
+| Native share completed                | Success alert "Countdown shared"                                                 |
+| Native share cancelled (`AbortError`) | None                                                                             |
+| Native share failed                   | Error alert "Couldn't open the share options. Copy the link above instead."     |
+| Image copied, app opened              | Success alert "Image copied. Choose a chat in `<App>` and paste it (⌘V / Ctrl+V) to attach it." |
+| Image downloaded, app opened          | Success alert "Image downloaded. Attach `<file name>` to the `<App>` chat."      |
+| Copy failed, downloaded instead       | Success alert "Couldn't copy the image, so it was downloaded instead. Attach `<file name>` to the `<App>` chat." |
+| Pop-up blocked                        | Same alert, with an **Open `<App>`** button linking to the share URL            |
 
 Automatic delivery with no user step would require the WhatsApp Business Platform or a Telegram bot, which need a backend, a business or bot account and the recipient's number or chat, so they are out of scope.
 
@@ -83,7 +107,7 @@ Automatic delivery with no user step would require the WhatsApp Business Platfor
 | Message (WhatsApp, native share) | `Countdown to <title>: <link>`    |
 | Telegram `text`            | `Countdown to <title>` (the link goes in `url`) |
 | Native share `title`       | `<title> · Travel Countdown`            |
-| Native share `files`       | The chosen PNG image                    |
+| Native share `files`       | The chosen PNG image (omitted when the browser can only share text) |
 
 The link is included in the message text (not as a separate `url`) for native sharing, because several apps drop the `url` when files are shared.
 
@@ -133,5 +157,6 @@ Custom image URLs are loaded with `crossOrigin="anonymous"`. If the image cannot
 | Triggers, validation, focus on error       | `client/src/pages/Home.tsx`            |
 | Title, units and status shared by preview and image | `client/src/countdown/display.ts` |
 | Image rendering (canvas)                   | `client/src/countdown/shareImage.ts`   |
-| Targets, message, mobile detection, download | `client/src/countdown/share.ts`      |
+| Targets, message, mobile detection, clipboard, download | `client/src/countdown/share.ts` |
+| Share targets section (steps and actions)  | `client/src/countdown/ShareTargets.tsx` |
 | Share modal                                | `client/src/countdown/ShareDialog.tsx` |
