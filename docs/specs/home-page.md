@@ -12,7 +12,7 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
     - Background
     - Custom font colors
   - **Preview** that displays the countdown in real time, applying every option set in the form.
-  - A **Generate link** button that validates the form and creates the countdown link ([Countdown link specification](countdown-link.md)).
+  - A **Share** button that validates the form, creates the countdown link and shares it ([Countdown link specification](countdown-link.md)).
 - **Footer**: logo and name, "Developed by Matheus Alves" (linking to https://matheusalves.dev/ in a new tab) and the current year.
 
 ## Details
@@ -39,7 +39,7 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
 - Desktop (≥ 900px): form on the left, preview on the right.
 - Mobile: single column, preview first so changes stay visible near the top.
 
-### Generate link
+### Share
 
 - The button is displayed below the form fields.
-- Validation, link format and the success dialog follow the [Countdown link specification](countdown-link.md).
+- Validation, link format, the native share sheet and the share dialog follow the [Countdown link specification](countdown-link.md).

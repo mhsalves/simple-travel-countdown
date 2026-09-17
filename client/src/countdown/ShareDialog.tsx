@@ -8,20 +8,20 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
 
 type CopyStatus = 'idle' | 'copied' | 'failed';
 
-interface LinkDialogProps {
+interface ShareDialogProps {
   open: boolean;
   link: string;
   title: string;
   onClose: () => void;
 }
 
-function LinkDialog({ open, link, title, onClose }: LinkDialogProps) {
+function ShareDialog({ open, link, title, onClose }: ShareDialogProps) {
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle');
   const copied = copyStatus === 'copied';
 
@@ -40,17 +40,17 @@ function LinkDialog({ open, link, title, onClose }: LinkDialogProps) {
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      aria-labelledby="link-dialog-title"
-      aria-describedby="link-dialog-description"
+      aria-labelledby="share-dialog-title"
+      aria-describedby="share-dialog-description"
     >
-      <DialogTitle id="link-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <CheckCircleRoundedIcon color="success" />
-        Your countdown link is ready
+      <DialogTitle id="share-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <ShareRoundedIcon color="primary" />
+        Share your countdown
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2.5}>
-          <DialogContentText id="link-dialog-description">
-            Share this link with anyone to show the countdown for “{title}”.
+          <DialogContentText id="share-dialog-description">
+            Copy this link and send it to anyone to show the countdown for “{title}”.
           </DialogContentText>
           <TextField
             label="Countdown link"
@@ -78,4 +78,4 @@ function LinkDialog({ open, link, title, onClose }: LinkDialogProps) {
   );
 }
 
-export default LinkDialog;
+export default ShareDialog;

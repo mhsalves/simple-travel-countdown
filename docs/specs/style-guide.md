@@ -130,9 +130,10 @@ A single theme created with `createTheme` and applied with `ThemeProvider` + `Cs
 | Background / font colors | `TextField` with a native color swatch in `InputAdornment` | Editable hex value (invalid values are flagged and reverted on blur); labels: Background color, Start color, End color, Title color, Counter color |
 | Image presets         | `ToggleButton` grid (2 columns; names are too long for 4) | Presets from 1.4 with a photo thumbnail, plus a "Custom" option (`AddPhotoAlternateRounded` icon); selecting a preset sets the Image URL (resolved from the bundled asset) and both font colors, and hides the Image URL field; selecting Custom clears the URL and shows the field again |
 | Image URL             | `TextField` (`type="url"`)                        | Shown only when Custom is selected; `error` + `helperText` when the URL is not `http(s)` |
-| Generate link         | `Button` (`type="submit"`, `variant="contained"`, `size="large"`, `fullWidth`) | Primary color              |
-| Field errors          | `error` + `helperText` on the field               | Shown after the first generate attempt; the title counter is replaced by its error |
-| Link success          | `Dialog` (`maxWidth="sm"`, `fullWidth`)           | `DialogTitle` with `CheckCircleRounded` in `success` color; read-only `TextField` with the link |
+| Share                 | `Button` (`type="submit"`, `variant="contained"`, `size="large"`, `fullWidth`) | Primary color, `ShareRounded` start icon |
+| Field errors          | `error` + `helperText` on the field               | Shown after the first share attempt; the title counter is replaced by its error |
+| Share dialog          | `Dialog` (`maxWidth="sm"`, `fullWidth`)           | Fallback when the native share sheet is unavailable; `DialogTitle` with `ShareRounded` in `primary` color; read-only `TextField` with the link |
+| Shared confirmation   | `Snackbar` + `Alert` (`severity="success"`, `variant="filled"`) | "Countdown shared", bottom center, auto-hides after 4 seconds |
 | Copy link             | `Button` (`variant="contained"`)                  | `ContentCopyRounded` icon; after copying: `success` color, `CheckRounded` icon and "Copied" |
 | Copy failure          | `Alert` (`severity="error"`)                      | Inside the dialog, below the link                        |
 | Field groups          | `Stack` (`spacing={2.5}`) and `FormLabel`         |                                                          |

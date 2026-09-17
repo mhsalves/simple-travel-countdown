@@ -1,33 +1,43 @@
 import { useState } from 'react';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Countdown from '../countdown/Countdown';
 import CountdownForm from '../countdown/CountdownForm';
-import LinkDialog from '../countdown/LinkDialog';
+import ShareDialog from '../countdown/ShareDialog';
 import { createDefaultConfig } from '../countdown/config';
 import { buildCountdownLink, encodeCountdownToken } from '../countdown/link';
+import { shareCountdownLink } from '../countdown/share';
 
-interface GeneratedLink {
+interface SharedLink {
   id: number;
   link: string;
   title: string;
 }
 
+const SHARED_MESSAGE_DURATION_MS = 4000;
+
 function Home() {
   const [config, setConfig] = useState(createDefaultConfig);
-  const [generated, setGenerated] = useState<GeneratedLink | null>(null);
+  const [shared, setShared] = useState<SharedLink | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [sharedMessageOpen, setSharedMessageOpen] = useState(false);
 
-  function handleGenerate() {
-    setGenerated((previous) => ({
-      id: (previous?.id ?? 0) + 1,
-      link: buildCountdownLink(encodeCountdownToken(config)),
-      title: config.title.trim(),
-    }));
-    setDialogOpen(true);
+  async function handleShare() {
+    const link = buildCountdownLink(encodeCountdownToken(config));
+    const title = config.title.trim();
+    const result = await shareCountdownLink(link, title);
+
+    if (result === 'shared') {
+      setSharedMessageOpen(true);
+    } else if (result === 'unsupported' || result === 'failed') {
+      setShared((previous) => ({ id: (previous?.id ?? 0) + 1, link, title }));
+      setDialogOpen(true);
+    }
   }
 
   return (
@@ -48,7 +58,7 @@ function Home() {
           <Typography variant="h1" id="form-title" sx={{ mb: 1.5 }}>
             Create your countdown
           </Typography>
-          <CountdownForm config={config} onChange={setConfig} onGenerate={handleGenerate} />
+          <CountdownForm config={config} onChange={setConfig} onShare={handleShare} />
         </Box>
         <Box
           component="section"
@@ -62,15 +72,25 @@ function Home() {
         </Box>
       </Container>
       <Footer />
-      {generated && (
-        <LinkDialog
-          key={generated.id}
+      {shared && (
+        <ShareDialog
+          key={shared.id}
           open={dialogOpen}
-          link={generated.link}
-          title={generated.title}
+          link={shared.link}
+          title={shared.title}
           onClose={() => setDialogOpen(false)}
         />
       )}
+      <Snackbar
+        open={sharedMessageOpen}
+        autoHideDuration={SHARED_MESSAGE_DURATION_MS}
+        onClose={() => setSharedMessageOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled" onClose={() => setSharedMessageOpen(false)}>
+          Countdown shared
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

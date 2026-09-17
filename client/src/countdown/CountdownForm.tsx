@@ -9,6 +9,7 @@ import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import AddPhotoAlternateRoundedIcon from '@mui/icons-material/AddPhotoAlternateRounded';
+import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import ColorField from './ColorField';
 import {
@@ -37,10 +38,10 @@ const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
 interface CountdownFormProps {
   config: CountdownConfig;
   onChange: (config: CountdownConfig) => void;
-  onGenerate: () => void;
+  onShare: () => void;
 }
 
-function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
+function CountdownForm({ config, onChange, onShare }: CountdownFormProps) {
   const { background } = config;
   const [submitted, setSubmitted] = useState(false);
   const errors = submitted ? validateCountdownConfig(config) : {};
@@ -98,7 +99,7 @@ function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
     event.preventDefault();
     setSubmitted(true);
     if (!hasErrors(validateCountdownConfig(config))) {
-      onGenerate();
+      onShare();
     }
   }
 
@@ -263,8 +264,8 @@ function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
             </Stack>
           </Stack>
 
-          <Button type="submit" variant="contained" size="large" fullWidth>
-            Generate link
+          <Button type="submit" variant="contained" size="large" fullWidth startIcon={<ShareRoundedIcon />}>
+            Share
           </Button>
         </Stack>
       </CardContent>
