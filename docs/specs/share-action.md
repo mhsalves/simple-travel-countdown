@@ -45,21 +45,34 @@ Both orientations are rendered when the modal opens, so switching is instant and
 
 ### 3.3 Share targets
 
-| Target       | Visible            | Action                                                                                   |
-| ------------ | ------------------ | ---------------------------------------------------------------------------------------- |
-| **WhatsApp** | Always             | Downloads the chosen image and opens `https://wa.me/?text=<message>` in a new tab/app    |
-| **Telegram** | Always             | Downloads the chosen image and opens `https://t.me/share/url?url=<link>&text=<text>`     |
-| **Other**    | Mobile only, and only when the browser can share files | Opens the native share sheet with the chosen image file and the message |
+WhatsApp and Telegram share links (`wa.me`, `web.whatsapp.com/send`, `t.me/share/url`) only accept text, and web pages have no API to attach a file to a specific app. The image is attached in the closest way each device allows:
 
-Share targets are disabled until the chosen image is rendered.
+| Target       | Visible | Mobile with file sharing (Web Share API)                                  | Desktop, or mobile without file sharing |
+| ------------ | ------- | -------------------------------------------------------------------------- | --------------------------------------- |
+| **WhatsApp** | Always  | Native share sheet with the image file and the message; choosing WhatsApp sends the image **attached** with the link | Copies the image to the clipboard and opens `https://web.whatsapp.com/send?text=<message>` (desktop) or `https://wa.me/?text=<message>` (mobile); the user pastes the image into the chat to attach it |
+| **Telegram** | Always  | Same native share sheet; choosing Telegram sends the image attached with the link | Copies the image to the clipboard and opens `https://t.me/share/url?url=<link>&text=<text>`; the user pastes the image into the chat |
+| **Other**    | Mobile with file sharing only | Native share sheet with the image file and the message | Hidden |
 
-Web pages cannot attach files to WhatsApp or Telegram through their share links, which only accept text. For those targets the image is downloaded at the same moment, and a success alert tells the user to attach the downloaded image to the message. **Other** sends the image and link together in one step.
+If the browser cannot write images to the clipboard, the image is downloaded instead so it can be attached manually. Share targets are disabled until the chosen image is rendered.
 
-| Native share outcome                  | Feedback                                             |
-| ------------------------------------- | ---------------------------------------------------- |
-| Shared                                | Success alert "Countdown shared"                     |
-| Cancelled by the user (`AbortError`)  | None                                                 |
-| Any other error                       | Error alert suggesting WhatsApp, Telegram or copying the link |
+A caption below the targets explains what will happen on the current device:
+
+| Case                          | Caption                                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| Mobile with file sharing      | "Choose WhatsApp or Telegram in the share options to send the image attached with the link."      |
+| Clipboard image supported     | "The image is copied so you can paste it into the chat, with the message and link already filled in." |
+| Otherwise                     | "The image is downloaded so you can attach it to the chat, with the message and link already filled in." |
+
+| Outcome                                      | Feedback                                                                         |
+| -------------------------------------------- | -------------------------------------------------------------------------------- |
+| Native share completed                       | Success alert "Countdown shared"                                                 |
+| Native share cancelled (`AbortError`)        | None                                                                             |
+| Native share failed                          | Error alert "Couldn’t open the share options. Try again or copy the link."      |
+| Image copied, app opened                     | Success alert "Image copied. Paste it into the <app> chat (⌘V / Ctrl+V) to attach it to the message." |
+| Image downloaded, app opened                 | Success alert "Image downloaded. Attach it to your <app> message with the link." |
+| Pop-up blocked                               | Same alert, with an **Open <app>** button linking to the share URL              |
+
+Automatic delivery with no user step would require the WhatsApp Business Platform or a Telegram bot, which need a backend, a business or bot account and the recipient's number or chat, so they are out of scope.
 
 **Mobile** means `navigator.userAgentData.mobile` when available, otherwise a user agent matching Android, iPhone, iPad, iPod or Mobile, or an iPad reporting a desktop user agent with touch support.
 
@@ -67,7 +80,7 @@ Web pages cannot attach files to WhatsApp or Telegram through their share links,
 
 | Field                      | Value                                   |
 | -------------------------- | --------------------------------------- |
-| Message (WhatsApp, Other)  | `Countdown to <title>: <link>`          |
+| Message (WhatsApp, native share) | `Countdown to <title>: <link>`    |
 | Telegram `text`            | `Countdown to <title>` (the link goes in `url`) |
 | Native share `title`       | `<title> · Travel Countdown`            |
 | Native share `files`       | The chosen PNG image                    |

@@ -25,8 +25,10 @@ export function buildShareMessage(title: string, link: string): string {
   return `Countdown to ${title}: ${link}`;
 }
 
-export function getWhatsAppShareUrl(title: string, link: string): string {
-  return `https://wa.me/?text=${encodeURIComponent(buildShareMessage(title, link))}`;
+export function getWhatsAppShareUrl(title: string, link: string, mobile: boolean): string {
+  const text = encodeURIComponent(buildShareMessage(title, link));
+  // Desktop goes straight to WhatsApp Web, where a copied image can be pasted into the chat.
+  return mobile ? `https://wa.me/?text=${text}` : `https://web.whatsapp.com/send?text=${text}`;
 }
 
 export function getTelegramShareUrl(title: string, link: string): string {
@@ -58,8 +60,35 @@ export function downloadFile(file: File) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function openInNewTab(url: string) {
-  window.open(url, '_blank', 'noopener,noreferrer');
+export function openInNewTab(url: string): boolean {
+  // `noopener` in the features string makes window.open return null, so the opener is cleared manually
+  // to still detect a blocked pop-up.
+  const opened = window.open(url, '_blank');
+  if (!opened) {
+    return false;
+  }
+  opened.opener = null;
+  return true;
+}
+
+export function canCopyImageToClipboard(): boolean {
+  return typeof ClipboardItem !== 'undefined' && typeof navigator.clipboard?.write === 'function';
+}
+
+export async function copyImageToClipboard(file: File): Promise<boolean> {
+  if (!canCopyImageToClipboard()) {
+    return false;
+  }
+  try {
+    await navigator.clipboard.write([new ClipboardItem({ [file.type]: file })]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function getPasteShortcut(): string {
+  return /Mac|iPhone|iPad|iPod/.test(navigator.userAgent) ? '⌘V' : 'Ctrl+V';
 }
 
 export async function shareNatively(file: File, title: string, link: string): Promise<NativeShareResult> {

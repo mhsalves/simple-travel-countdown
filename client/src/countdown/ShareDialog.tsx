@@ -13,6 +13,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
@@ -24,8 +25,12 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { CountdownConfig } from './config';
 import {
+  NativeShareResult,
+  canCopyImageToClipboard,
   canShareFiles,
+  copyImageToClipboard,
   downloadFile,
+  getPasteShortcut,
   getShareImageFileName,
   getTelegramShareUrl,
   getWhatsAppShareUrl,
@@ -42,7 +47,13 @@ type RenderedImage =
   | { status: 'error' }
   | { status: 'ready'; file: File; url: string; backgroundIncluded: boolean };
 
-type Feedback = { severity: 'success' | 'error'; message: string } | null;
+type ShareApp = 'WhatsApp' | 'Telegram';
+
+type Feedback = {
+  severity: 'success' | 'error';
+  message: string;
+  action?: { label: string; url: string };
+} | null;
 
 const ORIENTATIONS: { value: ImageOrientation; label: string; icon: JSX.Element }[] = [
   { value: 'landscape', label: 'Landscape', icon: <CropLandscapeRoundedIcon /> },
@@ -62,6 +73,7 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const title = config.title.trim();
   const isMobile = useMemo(isMobileDevice, []);
+  const canCopyImage = useMemo(canCopyImageToClipboard, []);
 
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle');
   const [orientation, setOrientation] = useState<ImageOrientation>('landscape');
@@ -101,7 +113,7 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
 
   const image = images[orientation];
   const readyFile = image.status === 'ready' ? image.file : null;
-  const showNativeShare = isMobile && readyFile !== null && canShareFiles([readyFile]);
+  const canShareImageNatively = isMobile && readyFile !== null && canShareFiles([readyFile]);
 
   async function handleCopy() {
     try {
@@ -112,28 +124,46 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
     }
   }
 
-  function shareToApp(appName: string, url: string) {
-    if (!readyFile) {
-      return;
-    }
-    downloadFile(readyFile);
-    openInNewTab(url);
-    setFeedback({
-      severity: 'success',
-      message: `Image downloaded. Attach it to your ${appName} message with the link.`,
-    });
-  }
-
-  async function handleNativeShare() {
-    if (!readyFile) {
-      return;
-    }
-    const result = await shareNatively(readyFile, title, link);
+  function showNativeShareResult(result: NativeShareResult) {
     if (result === 'shared') {
       setFeedback({ severity: 'success', message: 'Countdown shared' });
     } else if (result === 'failed') {
-      setFeedback({ severity: 'error', message: 'Couldn’t open the share options. Try WhatsApp, Telegram or copy the link.' });
+      setFeedback({ severity: 'error', message: 'Couldn’t open the share options. Try again or copy the link.' });
     }
+  }
+
+  async function handleNativeShare() {
+    if (readyFile) {
+      showNativeShareResult(await shareNatively(readyFile, title, link));
+    }
+  }
+
+  async function shareToApp(app: ShareApp) {
+    if (!readyFile) {
+      return;
+    }
+
+    // Mobile: the share sheet carries the image file, so picking the app sends it attached.
+    if (canShareImageNatively) {
+      showNativeShareResult(await shareNatively(readyFile, title, link));
+      return;
+    }
+
+    // Desktop: app share links only accept text, so the image goes to the clipboard to be pasted in the chat.
+    const url = app === 'WhatsApp' ? getWhatsAppShareUrl(title, link, isMobile) : getTelegramShareUrl(title, link);
+    const copied = await copyImageToClipboard(readyFile);
+    if (!copied) {
+      downloadFile(readyFile);
+    }
+    const opened = openInNewTab(url);
+
+    setFeedback({
+      severity: 'success',
+      message: copied
+        ? `Image copied. Paste it into the ${app} chat (${getPasteShortcut()}) to attach it to the message.`
+        : `Image downloaded. Attach it to your ${app} message with the link.`,
+      action: opened ? undefined : { label: `Open ${app}`, url },
+    });
   }
 
   return (
@@ -238,14 +268,14 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
               sx={{
                 display: 'grid',
                 gap: 1.5,
-                gridTemplateColumns: { xs: '1fr', sm: `repeat(${showNativeShare ? 3 : 2}, 1fr)` },
+                gridTemplateColumns: { xs: '1fr', sm: `repeat(${canShareImageNatively ? 3 : 2}, 1fr)` },
               }}
             >
               <Button
                 variant="contained"
                 startIcon={<WhatsAppIcon />}
                 disabled={!readyFile}
-                onClick={() => shareToApp('WhatsApp', getWhatsAppShareUrl(title, link))}
+                onClick={() => shareToApp('WhatsApp')}
               >
                 WhatsApp
               </Button>
@@ -253,18 +283,35 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
                 variant="contained"
                 startIcon={<TelegramIcon />}
                 disabled={!readyFile}
-                onClick={() => shareToApp('Telegram', getTelegramShareUrl(title, link))}
+                onClick={() => shareToApp('Telegram')}
               >
                 Telegram
               </Button>
-              {showNativeShare && (
+              {canShareImageNatively && (
                 <Button variant="contained" startIcon={<ShareRoundedIcon />} onClick={handleNativeShare}>
                   Other
                 </Button>
               )}
             </Box>
+            <Typography variant="body2" color="text.secondary">
+              {canShareImageNatively
+                ? 'Choose WhatsApp or Telegram in the share options to send the image attached with the link.'
+                : canCopyImage
+                  ? 'The image is copied so you can paste it into the chat, with the message and link already filled in.'
+                  : 'The image is downloaded so you can attach it to the chat, with the message and link already filled in.'}
+            </Typography>
             {feedback && (
-              <Alert severity={feedback.severity} onClose={() => setFeedback(null)}>
+              <Alert
+                severity={feedback.severity}
+                onClose={() => setFeedback(null)}
+                action={
+                  feedback.action && (
+                    <Button color="inherit" size="small" href={feedback.action.url} target="_blank" rel="noopener noreferrer">
+                      {feedback.action.label}
+                    </Button>
+                  )
+                }
+              >
                 {feedback.message}
               </Alert>
             )}
