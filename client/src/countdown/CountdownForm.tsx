@@ -30,9 +30,9 @@ import {
 import { IMAGE_URL_ERROR, validateCountdownConfig } from './validation';
 
 const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
-  { type: 'solid', label: 'Solid color' },
-  { type: 'gradient', label: 'Gradient' },
-  { type: 'image', label: 'Image' },
+  { type: 'solid', label: 'Cor sólida' },
+  { type: 'gradient', label: 'Gradiente' },
+  { type: 'image', label: 'Imagem' },
 ];
 
 interface CountdownFormProps {
@@ -109,8 +109,8 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
       <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
         <Stack spacing={2.5}>
           <TextField
-            label="Title"
-            placeholder="Trip to Lisbon"
+            label="Título"
+            placeholder="Viagem para Lisboa"
             value={config.title}
             onChange={(event) => update({ title: event.target.value })}
             error={Boolean(errors.title)}
@@ -119,7 +119,7 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
           />
 
           <DateTimePicker
-            label="Finish date"
+            label="Data final"
             value={config.finishDate}
             onChange={(value) => update({ finishDate: value })}
             disablePast
@@ -134,7 +134,7 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
 
           <Stack spacing={1.5}>
             <FormLabel component="legend" id="background-label">
-              Background
+              Fundo
             </FormLabel>
             <ToggleButtonGroup
               exclusive
@@ -153,14 +153,14 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
             </ToggleButtonGroup>
 
             {background.type === 'solid' && (
-              <ColorField label="Background color" value={background.color} onChange={(color) => updateBackground({ color })} />
+              <ColorField label="Cor de fundo" value={background.color} onChange={(color) => updateBackground({ color })} />
             )}
 
             {background.type === 'gradient' && (
               <>
                 <Box
                   role="group"
-                  aria-label="Gradient presets"
+                  aria-label="Gradientes prontos"
                   sx={{ display: 'grid', gap: 1, gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' } }}
                 >
                   {GRADIENT_PRESETS.map((preset) => (
@@ -188,15 +188,15 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
                   ))}
                 </Box>
                 <Stack direction="row" spacing={1.5}>
-                  <ColorField label="Start color" value={background.from} onChange={(from) => updateBackground({ from })} />
-                  <ColorField label="End color" value={background.to} onChange={(to) => updateBackground({ to })} />
+                  <ColorField label="Cor inicial" value={background.from} onChange={(from) => updateBackground({ from })} />
+                  <ColorField label="Cor final" value={background.to} onChange={(to) => updateBackground({ to })} />
                 </Stack>
               </>
             )}
 
             {background.type === 'image' && (
               <>
-                <Box role="group" aria-label="Image presets" sx={{ display: 'grid', gap: 1, gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                <Box role="group" aria-label="Imagens prontas" sx={{ display: 'grid', gap: 1, gridTemplateColumns: 'repeat(2, 1fr)' }}>
                   {IMAGE_PRESETS.map((preset) => (
                     <ToggleButton
                       key={preset.name}
@@ -229,15 +229,15 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
                   >
                     <AddPhotoAlternateRoundedIcon aria-hidden sx={{ width: 20, height: 20, flexShrink: 0 }} />
                     <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      Custom
+                      Personalizada
                     </Box>
                   </ToggleButton>
                 </Box>
                 {isCustomImage && (
                   <TextField
-                    label="Image URL"
+                    label="URL da imagem"
                     type="url"
-                    placeholder="https://example.com/beach.jpg"
+                    placeholder="https://exemplo.com/praia.jpg"
                     value={background.url}
                     error={Boolean(imageUrlError)}
                     helperText={imageUrlError ?? ' '}
@@ -250,11 +250,11 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
           </Stack>
 
           <Stack spacing={1.5}>
-            <FormLabel component="legend">Font colors</FormLabel>
+            <FormLabel component="legend">Cores do texto</FormLabel>
             <Stack direction="row" spacing={1.5}>
-              <ColorField label="Title color" value={config.titleColor} onChange={(titleColor) => update({ titleColor })} />
+              <ColorField label="Cor do título" value={config.titleColor} onChange={(titleColor) => update({ titleColor })} />
               <ColorField
-                label="Counter color"
+                label="Cor do contador"
                 value={config.counterColor}
                 onChange={(counterColor) => update({ counterColor })}
               />
@@ -262,7 +262,7 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
           </Stack>
 
           <Button type="submit" variant="contained" size="large" fullWidth startIcon={<ShareRoundedIcon />}>
-            Share
+            Compartilhar
           </Button>
         </Stack>
       </CardContent>

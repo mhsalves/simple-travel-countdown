@@ -1,8 +1,6 @@
 import { CountdownConfig } from './config';
 import { getTimeLeft } from './timeLeft';
 
-const TITLE_PLACEHOLDER = 'Your trip title';
-
 export interface CountdownUnit {
   label: string;
   value: string;
@@ -21,18 +19,18 @@ export function getCountdownDisplay(config: CountdownConfig, now: number): Count
 
   let status = '';
   if (!target) {
-    status = 'Choose a finish date';
+    status = 'Escolha a data final';
   } else if (timeLeft.finished) {
-    status = 'The countdown has finished';
+    status = 'A contagem terminou';
   }
 
   return {
-    title: config.title.trim() || TITLE_PLACEHOLDER,
+    title: config.title.trim() || 'Título da sua viagem',
     units: [
-      { label: 'Days', value: pad(timeLeft.days) },
-      { label: 'Hours', value: pad(timeLeft.hours) },
-      { label: 'Minutes', value: pad(timeLeft.minutes) },
-      { label: 'Seconds', value: pad(timeLeft.seconds) },
+      { label: 'Dias', value: pad(timeLeft.days) },
+      { label: 'Horas', value: pad(timeLeft.hours) },
+      { label: 'Minutos', value: pad(timeLeft.minutes) },
+      { label: 'Segundos', value: pad(timeLeft.seconds) },
     ],
     status,
   };

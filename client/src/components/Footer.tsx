@@ -15,7 +15,7 @@ function Footer() {
         >
           <Brand size={24} nameSx={{ fontSize: '0.875rem' }} />
           <Typography variant="body2">
-            Developed by{' '}
+            Desenvolvido por{' '}
             <Link href="https://matheusalves.dev/" target="_blank" rel="noopener noreferrer">
               Matheus Alves
             </Link>{' '}

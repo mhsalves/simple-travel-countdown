@@ -39,7 +39,7 @@ function ColorField({ label, value, onChange }: ColorFieldProps) {
               <Box
                 component="input"
                 type="color"
-                aria-label={`${label} picker`}
+                aria-label={`Seletor de ${label}`}
                 value={value}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value.toUpperCase())}
                 sx={{
