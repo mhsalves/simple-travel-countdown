@@ -183,7 +183,7 @@ The **lockup** is the mark followed by the name "Travel Countdown" in Inter 700,
 | Footer                        | Full color lockup        | 24px      | 0.875rem, `text-muted` color, followed by "Developed by Matheus Alves · year" ("Matheus Alves" is a `primary` link to https://matheusalves.dev/) |
 | Home — form                   | Not used                 | —         | —                                   |
 | Home — preview                | Not used (user content)  | —         | —                                   |
-| Countdown view (planned)      | Monochrome lockup, bottom corner | 20px | 0.75rem, counter font color at 80% opacity, links to the home page |
+| Countdown view                | Not used                 | —         | Replaced by a "Create my countdown" button below the countdown ([spec](countdown-page.md)) |
 | Favicon / browser tab         | Full color mark (`favicon.svg`, fallback `favicon-32.png`) | 16px, 32px | —   |
 | Apple touch icon              | Full color mark with square badge (`apple-touch-icon.png`, the OS applies the corner mask) | 180px | — |
 

@@ -8,12 +8,14 @@ const TITLE_PLACEHOLDER = 'Your trip title';
 
 interface CountdownProps {
   config: CountdownConfig;
+  variant?: 'preview' | 'page';
 }
 
-function Countdown({ config }: CountdownProps) {
+function Countdown({ config, variant = 'preview' }: CountdownProps) {
   const now = useNow();
   const target = config.finishDate?.isValid() ? config.finishDate.toDate() : null;
   const timeLeft = getTimeLeft(target ?? new Date(now), now);
+  const isPage = variant === 'page';
 
   const units = [
     { label: 'Days', value: timeLeft.days },
@@ -31,14 +33,16 @@ function Countdown({ config }: CountdownProps) {
 
   return (
     <Stack
-      spacing={3}
+      spacing={isPage ? 5 : 3}
       sx={{
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: 360,
+        flex: isPage ? 1 : undefined,
+        width: isPage ? '100%' : undefined,
+        minHeight: isPage ? undefined : 360,
         px: 2,
-        py: 5,
-        borderRadius: '12px',
+        py: isPage ? 8 : 5,
+        borderRadius: isPage ? 0 : '12px',
         textAlign: 'center',
       }}
       style={getBackgroundStyle(config.background)}
@@ -46,16 +50,31 @@ function Countdown({ config }: CountdownProps) {
       <Typography
         variant="h2"
         component="p"
-        sx={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', fontWeight: 700, lineHeight: 1.2, overflowWrap: 'anywhere' }}
+        sx={{
+          fontSize: isPage ? 'clamp(2rem, 6vw, 3.5rem)' : 'clamp(1.5rem, 4vw, 2.25rem)',
+          fontWeight: 700,
+          lineHeight: 1.2,
+          overflowWrap: 'anywhere',
+        }}
         style={{ color: config.titleColor }}
       >
         {config.title.trim() || TITLE_PLACEHOLDER}
       </Typography>
 
-      <Stack direction="row" role="timer" sx={{ gap: 'clamp(12px, 4vw, 32px)' }} style={{ color: config.counterColor }}>
+      <Stack
+        direction="row"
+        role="timer"
+        sx={{ gap: isPage ? 'clamp(20px, 6vw, 56px)' : 'clamp(12px, 4vw, 32px)' }}
+        style={{ color: config.counterColor }}
+      >
         {units.map(({ label, value }) => (
           <Stack key={label} sx={{ alignItems: 'center' }}>
-            <Typography variant="countdownValue">{String(value).padStart(2, '0')}</Typography>
+            <Typography
+              variant="countdownValue"
+              sx={isPage ? { fontSize: 'clamp(3rem, 12vw, 6rem)' } : undefined}
+            >
+              {String(value).padStart(2, '0')}
+            </Typography>
             <Typography variant="overline" sx={{ opacity: 0.85 }}>
               {label}
             </Typography>
