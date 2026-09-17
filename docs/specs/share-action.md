@@ -1,6 +1,6 @@
 # Share action specification
 
-How a countdown is shared from the home page: the share triggers, the share modal, the shared image and the share targets. The link format is defined in the [Countdown link specification](countdown-link.md) and visuals in the [Style guide](style-guide.md).
+How a countdown is shared: the share triggers, the share modal, the shared image and the share targets. The interface texts quoted here are shown in Portuguese ([Language specification](language.md)); this document keeps their English meaning for reference. The link format is defined in the [Countdown link specification](countdown-link.md) and visuals in the [Style guide](style-guide.md).
 
 ## 1. Requirements
 
@@ -14,12 +14,15 @@ How a countdown is shared from the home page: the share triggers, the share moda
 
 ## 2. Triggers
 
-| Trigger           | Location                          | Style                                     |
-| ----------------- | --------------------------------- | ----------------------------------------- |
-| Form button       | Below the form fields             | `contained`, large, full width, share icon |
-| Preview button    | Below the preview                 | `outlined`, large, full width, share icon  |
+| Trigger                | Page           | Location              | Style                                      |
+| ---------------------- | -------------- | --------------------- | ------------------------------------------ |
+| Form button            | Home           | Below the form fields | `contained`, large, full width, share icon |
+| Preview button         | Home           | Below the preview     | `outlined`, large, full width, share icon  |
+| Header **Share** button | Countdown page | Header, after the edit action | `contained`, share icon; icon-only below `sm` ([Countdown page](countdown-page.md)) |
 
-Both triggers validate the form with the rules in [Countdown link specification §4.1](countdown-link.md#41-when-sharing). When validation fails, field errors are shown (and stay live while editing), the first invalid field is scrolled into view and focused, and the modal does not open. When it passes, the modal opens with a snapshot of the current form values and the current date and time as the **generation time**.
+The two home page triggers validate the form with the rules in [Countdown link specification §4.1](countdown-link.md#41-when-sharing). When validation fails, field errors are shown (and stay live while editing), the first invalid field is scrolled into view and focused, and the modal does not open. When it passes, the modal opens with a snapshot of the current form values and the current date and time as the **generation time**.
+
+On the countdown page there is nothing to validate: the header **Share** button opens the same modal for the countdown being viewed, using the page's own URL as the link, the configuration decoded from the token, and the moment the button was pressed as the generation time.
 
 ## 3. Share modal
 
@@ -130,7 +133,7 @@ The image reproduces the preview, filling the whole canvas (no rounded corners),
 | ------- | -------------------------------------------------------------------------------------- |
 | Background | Same as the preview: solid color, 135° gradient, or image covering the canvas with a `rgba(0, 0, 0, 0.4)` overlay |
 | Title   | Inter 700, title color, centered, wrapped to 86% of the width, up to 3 lines (ellipsis beyond) |
-| Units   | Days, hours, minutes, seconds as two-digit values (Inter 700, tabular numbers) with uppercase labels (Inter 500, 85% opacity), counter color, in one row scaled down to fit 86% of the width |
+| Units   | Dias, Horas, Minutos, Segundos as two-digit values (Inter 700, tabular numbers) with uppercase labels (Inter 500, 85% opacity), counter color, in one row scaled down to fit 86% of the width |
 | Status  | "The countdown has finished" below the units when the finish date has passed          |
 
 Sizes scale from the preview (360 px tall) by `min(width, height) / 360`, and the content block is vertically centered.
