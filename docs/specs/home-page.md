@@ -12,7 +12,7 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
     - Background
     - Custom font colors
   - **Preview** that displays the countdown in real time, applying every option set in the form.
-  - A **Share** button that validates the form, creates the countdown link and shares it ([Countdown link specification](countdown-link.md)).
+  - A **Share** button on the form and another below the preview; both validate the form, create the countdown link and open the share modal ([Share action specification](share-action.md)).
 - **Footer**: logo and name, "Developed by Matheus Alves" (linking to https://matheusalves.dev/ in a new tab) and the current year.
 
 ## Details
@@ -41,5 +41,5 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
 
 ### Share
 
-- The button is displayed below the form fields.
-- Validation, link format, the native share sheet and the share dialog follow the [Countdown link specification](countdown-link.md).
+- One button is displayed below the form fields and another below the preview.
+- Validation and link format follow the [Countdown link specification](countdown-link.md); the share modal, image and share targets follow the [Share action specification](share-action.md).

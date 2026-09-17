@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -27,7 +27,7 @@ import {
   isHttpUrl,
   resolveAssetUrl,
 } from './config';
-import { IMAGE_URL_ERROR, hasErrors, validateCountdownConfig } from './validation';
+import { IMAGE_URL_ERROR, validateCountdownConfig } from './validation';
 
 const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
   { type: 'solid', label: 'Solid color' },
@@ -38,13 +38,13 @@ const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
 interface CountdownFormProps {
   config: CountdownConfig;
   onChange: (config: CountdownConfig) => void;
+  showErrors: boolean;
   onShare: () => void;
 }
 
-function CountdownForm({ config, onChange, onShare }: CountdownFormProps) {
+function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormProps) {
   const { background } = config;
-  const [submitted, setSubmitted] = useState(false);
-  const errors = submitted ? validateCountdownConfig(config) : {};
+  const errors = showErrors ? validateCountdownConfig(config) : {};
 
   function update(changes: Partial<CountdownConfig>) {
     onChange({ ...config, ...changes });
@@ -97,10 +97,7 @@ function CountdownForm({ config, onChange, onShare }: CountdownFormProps) {
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setSubmitted(true);
-    if (!hasErrors(validateCountdownConfig(config))) {
-      onShare();
-    }
+    onShare();
   }
 
   const imageUrlError =

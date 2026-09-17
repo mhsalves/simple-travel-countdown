@@ -1,43 +1,56 @@
-import { useState } from 'react';
-import Alert from '@mui/material/Alert';
+import { useRef, useState } from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
+import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Countdown from '../countdown/Countdown';
 import CountdownForm from '../countdown/CountdownForm';
 import ShareDialog from '../countdown/ShareDialog';
-import { createDefaultConfig } from '../countdown/config';
+import { CountdownConfig, createDefaultConfig } from '../countdown/config';
 import { buildCountdownLink, encodeCountdownToken } from '../countdown/link';
-import { shareCountdownLink } from '../countdown/share';
+import { hasErrors, validateCountdownConfig } from '../countdown/validation';
 
-interface SharedLink {
+interface ShareSession {
   id: number;
   link: string;
-  title: string;
+  config: CountdownConfig;
+  generatedAt: Date;
 }
-
-const SHARED_MESSAGE_DURATION_MS = 4000;
 
 function Home() {
   const [config, setConfig] = useState(createDefaultConfig);
-  const [shared, setShared] = useState<SharedLink | null>(null);
+  const [showErrors, setShowErrors] = useState(false);
+  const [session, setSession] = useState<ShareSession | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [sharedMessageOpen, setSharedMessageOpen] = useState(false);
+  const formSectionRef = useRef<HTMLElement>(null);
 
-  async function handleShare() {
-    const link = buildCountdownLink(encodeCountdownToken(config));
-    const title = config.title.trim();
-    const result = await shareCountdownLink(link, title);
+  function focusFirstInvalidField() {
+    // Runs after React commits the error state, so aria-invalid is up to date.
+    window.requestAnimationFrame(() => {
+      const section = formSectionRef.current;
+      const invalid = section?.querySelector<HTMLElement>('input[aria-invalid="true"], [aria-invalid="true"]');
+      (invalid ?? section)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      invalid?.focus({ preventScroll: true });
+    });
+  }
 
-    if (result === 'shared') {
-      setSharedMessageOpen(true);
-    } else if (result === 'unsupported' || result === 'failed') {
-      setShared((previous) => ({ id: (previous?.id ?? 0) + 1, link, title }));
-      setDialogOpen(true);
+  function handleShare() {
+    setShowErrors(true);
+    if (hasErrors(validateCountdownConfig(config))) {
+      focusFirstInvalidField();
+      return;
     }
+
+    setSession((previous) => ({
+      id: (previous?.id ?? 0) + 1,
+      link: buildCountdownLink(encodeCountdownToken(config)),
+      config,
+      generatedAt: new Date(),
+    }));
+    setDialogOpen(true);
   }
 
   return (
@@ -54,11 +67,11 @@ function Home() {
           alignItems: 'start',
         }}
       >
-        <Box component="section" aria-labelledby="form-title">
+        <Box component="section" aria-labelledby="form-title" ref={formSectionRef}>
           <Typography variant="h1" id="form-title" sx={{ mb: 1.5 }}>
             Create your countdown
           </Typography>
-          <CountdownForm config={config} onChange={setConfig} onShare={handleShare} />
+          <CountdownForm config={config} onChange={setConfig} showErrors={showErrors} onShare={handleShare} />
         </Box>
         <Box
           component="section"
@@ -69,28 +82,29 @@ function Home() {
             Preview
           </Typography>
           <Countdown config={config} />
+          <Button
+            variant="outlined"
+            size="large"
+            fullWidth
+            startIcon={<ShareRoundedIcon />}
+            onClick={handleShare}
+            sx={{ mt: 2 }}
+          >
+            Share
+          </Button>
         </Box>
       </Container>
       <Footer />
-      {shared && (
+      {session && (
         <ShareDialog
-          key={shared.id}
+          key={session.id}
           open={dialogOpen}
-          link={shared.link}
-          title={shared.title}
+          link={session.link}
+          config={session.config}
+          generatedAt={session.generatedAt}
           onClose={() => setDialogOpen(false)}
         />
       )}
-      <Snackbar
-        open={sharedMessageOpen}
-        autoHideDuration={SHARED_MESSAGE_DURATION_MS}
-        onClose={() => setSharedMessageOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success" variant="filled" onClose={() => setSharedMessageOpen(false)}>
-          Countdown shared
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

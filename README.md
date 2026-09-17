@@ -17,5 +17,6 @@ npm run dev
 - [Architecture](docs/architecture.md) — project structure and how client and server fit together
 - [Home page spec](docs/specs/home-page.md) — home page requirements
 - [Countdown link spec](docs/specs/countdown-link.md) — link format, token and share rules
+- [Share action spec](docs/specs/share-action.md) — share modal, image and share targets
 - [Style guide](docs/specs/style-guide.md) — colors, typography, form components and logo
 - [Deployment](docs/deployment.md) — GitHub Pages deploy from `main`

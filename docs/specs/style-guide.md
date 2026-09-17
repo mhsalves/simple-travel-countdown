@@ -130,10 +130,15 @@ A single theme created with `createTheme` and applied with `ThemeProvider` + `Cs
 | Background / font colors | `TextField` with a native color swatch in `InputAdornment` | Editable hex value (invalid values are flagged and reverted on blur); labels: Background color, Start color, End color, Title color, Counter color |
 | Image presets         | `ToggleButton` grid (2 columns; names are too long for 4) | Presets from 1.4 with a photo thumbnail, plus a "Custom" option (`AddPhotoAlternateRounded` icon); selecting a preset sets the Image URL (resolved from the bundled asset) and both font colors, and hides the Image URL field; selecting Custom clears the URL and shows the field again |
 | Image URL             | `TextField` (`type="url"`)                        | Shown only when Custom is selected; `error` + `helperText` when the URL is not `http(s)` |
-| Share                 | `Button` (`type="submit"`, `variant="contained"`, `size="large"`, `fullWidth`) | Primary color, `ShareRounded` start icon |
+| Share (form)          | `Button` (`type="submit"`, `variant="contained"`, `size="large"`, `fullWidth`) | Primary color, `ShareRounded` start icon |
+| Share (preview)       | `Button` (`variant="outlined"`, `size="large"`, `fullWidth`) | Below the preview, 16px top margin, `ShareRounded` start icon |
 | Field errors          | `error` + `helperText` on the field               | Shown after the first share attempt; the title counter is replaced by its error |
-| Share dialog          | `Dialog` (`maxWidth="sm"`, `fullWidth`)           | Fallback when the native share sheet is unavailable; `DialogTitle` with `ShareRounded` in `primary` color; read-only `TextField` with the link |
-| Shared confirmation   | `Snackbar` + `Alert` (`severity="success"`, `variant="filled"`) | "Countdown shared", bottom center, auto-hides after 4 seconds |
+| Share modal           | `Dialog` (`maxWidth="sm"`, `fullWidth`, `fullScreen` below `sm`) | `DialogTitle` with `ShareRounded` in `primary` color; sections Link, Image, Share to separated by `Divider`, each titled with `FormLabel` |
+| Share link            | Small read-only `TextField` + `outlined` **Copy** `Button` | After copying: `success` color, `CheckRounded` icon and "Copied" |
+| Image orientation     | `ToggleButtonGroup` (`exclusive`, `fullWidth`)    | `CropLandscapeRounded` Landscape, `CropPortraitRounded` Vertical |
+| Image preview         | `img` in a 280px `background.default` box with `divider` border | `CircularProgress` while rendering; 6px radius and `boxShadow: 2` on the image |
+| Share targets         | `contained` `Button`s in a grid (1 column below `sm`) | `WhatsApp`, `Telegram` and `ShareRounded` (Other, mobile only) icons |
+| Share feedback        | `Alert` (`success` / `error`), dismissible        | Below the share targets |
 | Copy link             | `Button` (`variant="contained"`)                  | `ContentCopyRounded` icon; after copying: `success` color, `CheckRounded` icon and "Copied" |
 | Copy failure          | `Alert` (`severity="error"`)                      | Inside the dialog, below the link                        |
 | Field groups          | `Stack` (`spacing={2.5}`) and `FormLabel`         |                                                          |

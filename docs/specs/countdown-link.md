@@ -1,12 +1,12 @@
 # Countdown link specification
 
-Rules for the link created and shared by the **Share** button on the home page. Form fields are described in the [Home page specification](home-page.md) and visuals in the [Style guide](style-guide.md).
+Rules for the link created by the **Share** action on the home page. Form fields are described in the [Home page specification](home-page.md) and visuals in the [Style guide](style-guide.md).
 
 ## 1. Requirements
 
 - The link path is `/countdown`, keeping the project's base URL format.
 - After the path comes a base64 token (`/countdown/<token>`) containing the form data as a compact binary payload. The token is the only source used to read the countdown configuration.
-- The home page action is **Share**: it creates the link and shares it through the device's native share sheet when available, falling back to a dialog with an option to copy the link (section 5).
+- The home page action is **Share**: it creates the link and opens the share modal ([Share action specification](share-action.md)).
 
 ## 2. URL format
 
@@ -71,7 +71,7 @@ When generating, colors are read from `#RRGGBB` input and written as raw bytes. 
 
 ### 4.1 When sharing
 
-Pressing **Share** validates the form. If any rule fails, no link is created or shared and each invalid field shows its error. Errors are shown only after the first attempt and then update as the user edits.
+Pressing either **Share** button validates the form. If any rule fails, no link is created or shared and each invalid field shows its error. Errors are shown only after the first attempt and then update as the user edits.
 
 | Field       | Rule                                   | Error message                                    |
 | ----------- | -------------------------------------- | ------------------------------------------------ |
@@ -86,38 +86,9 @@ Title length (60) and image URL length (1000) are enforced by the inputs, and co
 
 A token is valid only if it decodes (section 3.1) and the payload matches every rule in section 3.2, with the format version equal to `1`. A valid token whose finish date is in the past is still valid: the countdown shows as finished. Invalid tokens produce no configuration, and the page reading them must show an invalid link message.
 
-## 5. Share action
+## 5. Sharing
 
-After a valid **Share** press, the link is built from the current form values and shared:
-
-1. **Native share sheet** — when the browser supports the [Web Share API](https://developer.mozilla.org/docs/Web/API/Navigator/share) (`navigator.share`, and `navigator.canShare` accepts the data), the system share sheet opens with:
-
-   | Field   | Value                                |
-   | ------- | ------------------------------------ |
-   | `title` | `<title> · Travel Countdown`         |
-   | `text`  | `Countdown to <title>`               |
-   | `url`   | The countdown link                   |
-
-   | Outcome                             | Feedback                                                      |
-   | ----------------------------------- | ------------------------------------------------------------- |
-   | Shared                              | Success snackbar "Countdown shared" (auto-hides after 4 seconds) |
-   | Cancelled by the user (`AbortError`) | None                                                         |
-   | Any other error                     | Share dialog (step 2)                                         |
-
-2. **Share dialog** — when the Web Share API is unavailable (most desktop browsers) or fails, a dialog opens:
-
-   | Element  | Content                                                                           |
-   | -------- | --------------------------------------------------------------------------------- |
-   | Title    | Share icon + "Share your countdown"                                              |
-   | Message  | "Copy this link and send it to anyone to show the countdown for <title>."       |
-   | Link     | Read-only text field with the full link, selected on focus                       |
-   | Copy     | **Copy link** button. After copying it shows **Copied** with a check icon        |
-   | Failure  | If the clipboard is unavailable, an error alert asks to select and copy the link manually |
-   | Close    | **Close** button, `Esc` or clicking outside                                       |
-
-Each press creates the link from the current form values; the dialog opens with the copy state reset.
-
-The share sheet must be opened directly from the button press (browsers require a user gesture), so validation and link creation run synchronously before calling `navigator.share`.
+After a valid **Share** press, the link is built from the current form values and shared through the share modal, described in the [Share action specification](share-action.md).
 
 ## 6. Implementation
 
@@ -126,7 +97,5 @@ The share sheet must be opened directly from the button press (browsers require 
 | Binary payload encode/decode | `client/src/countdown/binary.ts`      |
 | base64url, build link       | `client/src/countdown/link.ts`        |
 | Form validation             | `client/src/countdown/validation.ts`  |
-| Native share                | `client/src/countdown/share.ts`       |
-| Share dialog                | `client/src/countdown/ShareDialog.tsx` |
 
 The page that reads the token and displays the countdown is described in the [Countdown page specification](countdown-page.md).
