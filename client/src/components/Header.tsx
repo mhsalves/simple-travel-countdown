@@ -23,10 +23,10 @@ function Header({ actions }: HeaderProps) {
             aria-label={t('header.home')}
             underline="none"
             color="inherit"
-            sx={{ display: 'inline-flex', borderRadius: 1 }}
+            sx={{ display: 'inline-flex', minWidth: 0, overflow: 'hidden', borderRadius: 1 }}
           >
-            {/* With actions the name is dropped on narrow screens, where it would wrap and grow the header. */}
-            <Brand size={32} nameSx={actions ? { display: { xs: 'none', sm: 'inline' } } : undefined} />
+            {/* With actions the name is dropped until there is room, where it would wrap and grow the header. */}
+            <Brand size={32} nameSx={actions ? { display: { xs: 'none', md: 'inline' }, whiteSpace: 'nowrap' } : undefined} />
           </Link>
           <Stack direction="row" sx={{ alignItems: 'center', gap: 1, flexShrink: 0 }}>
             {actions}

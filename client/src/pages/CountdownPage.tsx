@@ -3,6 +3,9 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import { useTranslation } from '../i18n/I18nProvider';
 import Header from '../components/Header';
 import Countdown from '../countdown/Countdown';
@@ -22,24 +25,28 @@ function CreateCountdownButton() {
   );
 }
 
-// Opens the home form with this countdown loaded.
-function EditCountdownButton({ token }: { token: string }) {
+// Opens the home form with this countdown loaded. Below `sm` the actions are
+// icon-only, so the header keeps the language selector on one line.
+function EditCountdownButton({ token, compact }: { token: string; compact: boolean }) {
   const { t } = useTranslation();
+  const label = t('action.editCountdown');
   return (
     <Button
       component="a"
       href={`${import.meta.env.BASE_URL}?edit=${token}`}
       variant="text"
-      sx={{ flexShrink: 0, px: 1.5, whiteSpace: 'nowrap' }}
+      aria-label={compact ? label : undefined}
+      sx={{ flexShrink: 0, px: compact ? 1 : 1.5, minWidth: 0, whiteSpace: 'nowrap' }}
     >
-      <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>{t('action.edit')}</Box>
-      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>{t('action.editCountdown')}</Box>
+      {compact ? <EditRoundedIcon /> : label}
     </Button>
   );
 }
 
 function CountdownPage({ token }: CountdownPageProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const compact = useMediaQuery(theme.breakpoints.down('sm'));
   const config = useMemo(() => decodeCountdownToken(token), [token]);
   const [share, setShare] = useState<{ id: number; generatedAt: Date } | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -85,9 +92,15 @@ function CountdownPage({ token }: CountdownPageProps) {
       <Header
         actions={
           <>
-            <EditCountdownButton token={token} />
-            <Button variant="contained" startIcon={<ShareRoundedIcon />} onClick={handleShare} sx={{ flexShrink: 0 }}>
-              {t('action.share')}
+            <EditCountdownButton token={token} compact={compact} />
+            <Button
+              variant="contained"
+              onClick={handleShare}
+              aria-label={compact ? t('action.share') : undefined}
+              startIcon={compact ? undefined : <ShareRoundedIcon />}
+              sx={{ flexShrink: 0, minWidth: 0, px: compact ? 1.25 : 2 }}
+            >
+              {compact ? <ShareRoundedIcon /> : t('action.share')}
             </Button>
           </>
         }
