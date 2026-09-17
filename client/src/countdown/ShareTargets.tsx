@@ -48,23 +48,19 @@ const TARGETS: { value: Target; icon: JSX.Element }[] = [
   { value: 'Other', icon: <ShareRoundedIcon /> },
 ];
 
-const APP_TEXT_DROP_NOTE =
-  'Some apps keep only the image and drop the message. If the link is missing, copy it above and paste it in the chat.';
-
 interface ShareTargetsProps {
   file: File;
-  orientationLabel: string;
+  imageName: string;
   title: string;
   link: string;
 }
 
-function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps) {
+function ShareTargets({ file, imageName, title, link }: ShareTargetsProps) {
   const isMobile = useMemo(isMobileDevice, []);
   const nativeSupport = useMemo(() => getNativeShareSupport(file), [file]);
   const [clipboardAllowed, setClipboardAllowed] = useState<boolean | null>(null);
   const [target, setTarget] = useState<Target | null>(isMobile ? 'Other' : null);
   const [feedback, setFeedback] = useState<Feedback>(null);
-  const image = `${orientationLabel.toLowerCase()} image`;
 
   useEffect(() => {
     let active = true;
@@ -76,9 +72,12 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
 
   function showNativeResult(result: NativeShareResult) {
     if (result === 'shared') {
-      setFeedback({ severity: 'success', message: 'Countdown shared' });
+      setFeedback({ severity: 'success', message: 'Contagem compartilhada' });
     } else if (result === 'failed') {
-      setFeedback({ severity: 'error', message: 'Couldn’t open the share options. Copy the link above instead.' });
+      setFeedback({
+        severity: 'error',
+        message: 'Não foi possível abrir as opções de compartilhamento. Copie o link acima.',
+      });
     }
   }
 
@@ -90,13 +89,17 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
     }
     const opened = openInNewTab(url);
 
-    let message = `Image copied. Choose a chat in ${app} and paste it (${getPasteShortcut()}) to attach it.`;
+    let message = `Imagem copiada. Escolha uma conversa no ${app} e cole (${getPasteShortcut()}) para anexá-la.`;
     if (!copied) {
       message = clipboardAllowed
-        ? `Couldn’t copy the image, so it was downloaded instead. Attach ${file.name} to the ${app} chat.`
-        : `Image downloaded. Attach ${file.name} to the ${app} chat.`;
+        ? `Não foi possível copiar a imagem, então ela foi baixada. Anexe ${file.name} à conversa do ${app}.`
+        : `Imagem baixada. Anexe ${file.name} à conversa do ${app}.`;
     }
-    setFeedback({ severity: 'success', message, action: opened ? undefined : { label: `Open ${app}`, url } });
+    setFeedback({
+      severity: 'success',
+      message,
+      action: opened ? undefined : { label: `Abrir o ${app}`, url },
+    });
   }
 
   async function shareWithSystem() {
@@ -104,59 +107,61 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
   }
 
   function getAppInstructions(app: AppTarget): Instructions {
-    const opens = `${app} opens in a new tab with a message containing the countdown link.`;
+    const opens = `O ${app} abre em uma nova aba com uma mensagem contendo o link da contagem.`;
     if (clipboardAllowed) {
       return {
         steps: [
-          `The ${image} is copied to your clipboard.`,
+          `A ${imageName} é copiada para sua área de transferência.`,
           opens,
-          `Choose a chat and paste the image (${getPasteShortcut()}) to attach it.`,
+          `Escolha uma conversa e cole a imagem (${getPasteShortcut()}) para anexá-la.`,
         ],
-        actionLabel: `Copy image and open ${app}`,
+        actionLabel: `Copiar imagem e abrir o ${app}`,
         action: () => shareToApp(app),
       };
     }
     return {
       steps: [
-        <>
-          Your browser can’t copy images, so the {image} is downloaded to your computer as <strong>{file.name}</strong>.
-        </>,
+        `Seu navegador não copia imagens, então a ${imageName} é baixada no seu computador como ${file.name}.`,
         opens,
-        'Choose a chat and attach the downloaded image.',
+        'Escolha uma conversa e anexe a imagem baixada.',
       ],
-      actionLabel: `Download image and open ${app}`,
+      actionLabel: `Baixar imagem e abrir o ${app}`,
       action: () => shareToApp(app),
     };
   }
 
   function getNativeInstructions(): Instructions {
-    const shareOptions = isMobile ? 'Your phone’s share options' : 'Your system’s share options';
+    const options = isMobile
+      ? 'As opções de compartilhamento do seu celular'
+      : 'As opções de compartilhamento do seu sistema';
     if (nativeSupport === 'image') {
       return {
         steps: [
-          `${shareOptions} open with the ${image} and a message containing the countdown link.`,
-          'Choose WhatsApp, Telegram or any other app to send them.',
+          `${options} abrem com a ${imageName} e uma mensagem contendo o link da contagem.`,
+          'Escolha WhatsApp, Telegram ou qualquer outro app para enviar.',
         ],
-        note: APP_TEXT_DROP_NOTE,
-        actionLabel: 'Share image and link',
+        note:
+          'Alguns apps mantêm apenas a imagem e descartam a mensagem. ' +
+          'Se o link faltar, copie-o acima e cole na conversa.',
+        actionLabel: 'Compartilhar imagem e link',
         action: shareWithSystem,
       };
     }
     if (nativeSupport === 'link') {
       return {
         steps: [
-          'Your browser can share the link but not images.',
-          `${shareOptions} open with a message containing the countdown link, without the image.`,
+          'Seu navegador compartilha o link, mas não imagens.',
+          `${options} abrem com uma mensagem contendo o link da contagem, sem a imagem.`,
         ],
-        actionLabel: 'Share link',
+        actionLabel: 'Compartilhar link',
         action: shareWithSystem,
       };
     }
     return {
       steps: [
         isMobile
-          ? 'Your browser doesn’t support sharing. Copy the link above and paste it in any app.'
-          : 'Your browser doesn’t support system sharing. Use WhatsApp, Telegram or copy the link above.',
+          ? 'Seu navegador não suporta compartilhamento. Copie o link acima e cole em qualquer app.'
+          : 'Seu navegador não suporta o compartilhamento do sistema. Use WhatsApp, Telegram ou copie o link acima.',
       ],
     };
   }
@@ -172,7 +177,7 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
   return (
     <Stack spacing={1.5}>
       <FormLabel component="p" id="share-targets-label">
-        Share to
+        Compartilhar com
       </FormLabel>
 
       {!isMobile && (
@@ -190,7 +195,7 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
           {TARGETS.map(({ value, icon }) => (
             <ToggleButton key={value} value={value} sx={{ gap: 1 }}>
               {icon}
-              {value}
+              {value === 'Other' ? 'Outros' : value}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
@@ -198,7 +203,7 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
 
       {!target && (
         <Typography variant="body2" color="text.secondary">
-          Choose where to share to see how the image and link are sent.
+          Escolha onde compartilhar para ver como a imagem e o link são enviados.
         </Typography>
       )}
 

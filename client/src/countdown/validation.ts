@@ -8,19 +8,19 @@ export interface CountdownFormErrors {
   imageUrl?: string;
 }
 
-export const IMAGE_URL_ERROR = 'Enter a URL starting with http:// or https://';
+export const IMAGE_URL_ERROR = 'Digite uma URL começando com http:// ou https://';
 
 export function validateCountdownConfig(config: CountdownConfig, now = Date.now()): CountdownFormErrors {
   const errors: CountdownFormErrors = {};
 
   if (!config.title.trim()) {
-    errors.title = 'Enter a title for your countdown.';
+    errors.title = 'Digite um título para sua contagem.';
   }
 
   if (!config.finishDate?.isValid()) {
-    errors.finishDate = 'Choose the finish date.';
+    errors.finishDate = 'Escolha a data final.';
   } else if (config.finishDate.valueOf() <= now) {
-    errors.finishDate = 'Choose a date and time in the future.';
+    errors.finishDate = 'Escolha uma data e hora no futuro.';
   }
 
   if (config.background.type === 'image' && !isHttpUrl(config.background.url)) {

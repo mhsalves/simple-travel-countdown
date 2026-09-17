@@ -33,10 +33,20 @@ type RenderedImage =
   | { status: 'error' }
   | { status: 'ready'; file: File; url: string; backgroundIncluded: boolean };
 
-const ORIENTATIONS: { value: ImageOrientation; label: string; icon: JSX.Element }[] = [
-  { value: 'landscape', label: 'Landscape', icon: <CropLandscapeRoundedIcon /> },
-  { value: 'vertical', label: 'Vertical', icon: <CropPortraitRoundedIcon /> },
-];
+const ORIENTATIONS = [
+  {
+    value: 'landscape',
+    label: 'Horizontal',
+    imageName: 'imagem horizontal',
+    icon: <CropLandscapeRoundedIcon />,
+  },
+  {
+    value: 'vertical',
+    label: 'Vertical',
+    imageName: 'imagem vertical',
+    icon: <CropPortraitRoundedIcon />,
+  },
+] as const;
 
 interface ShareDialogProps {
   open: boolean;
@@ -87,7 +97,7 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
   }, [config, generatedAt, title]);
 
   const image = images[orientation];
-  const orientationLabel = ORIENTATIONS.find(({ value }) => value === orientation)?.label ?? '';
+  const selectedOrientation = ORIENTATIONS.find(({ value }) => value === orientation) ?? ORIENTATIONS[0];
 
   async function handleCopy() {
     try {
@@ -109,7 +119,7 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
     >
       <DialogTitle id="share-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
         <ShareRoundedIcon color="primary" />
-        Share your countdown
+        Compartilhe sua contagem
       </DialogTitle>
       <DialogContent>
         <Stack spacing={3}>
@@ -117,7 +127,7 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
             <FormLabel component="p">Link</FormLabel>
             <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
               <TextField
-                label="Countdown link"
+                label="Link da contagem"
                 size="small"
                 value={link}
                 onFocus={(event) => event.target.select()}
@@ -130,11 +140,11 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
                 onClick={handleCopy}
                 sx={{ flexShrink: 0 }}
               >
-                {copyStatus === 'copied' ? 'Copied' : 'Copy'}
+                {copyStatus === 'copied' ? 'Copiado' : 'Copiar'}
               </Button>
             </Stack>
             {copyStatus === 'failed' && (
-              <Alert severity="error">Couldn’t copy automatically. Select the link and copy it manually.</Alert>
+              <Alert severity="error">Não foi possível copiar automaticamente. Selecione o link e copie manualmente.</Alert>
             )}
           </Stack>
 
@@ -142,7 +152,7 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
 
           <Stack spacing={1.5}>
             <FormLabel component="p" id="share-image-label">
-              Image
+              Imagem
             </FormLabel>
             <ToggleButtonGroup
               exclusive
@@ -174,20 +184,20 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
                 borderColor: 'divider',
               }}
             >
-              {image.status === 'loading' && <CircularProgress aria-label="Rendering image" />}
-              {image.status === 'error' && <Alert severity="error">Couldn’t create the image.</Alert>}
+              {image.status === 'loading' && <CircularProgress aria-label="Gerando imagem" />}
+              {image.status === 'error' && <Alert severity="error">Não foi possível criar a imagem.</Alert>}
               {image.status === 'ready' && (
                 <Box
                   component="img"
                   src={image.url}
-                  alt={`${orientationLabel} image of the countdown for ${title}`}
+                  alt={`Imagem ${selectedOrientation.label} da contagem para ${title}`}
                   sx={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '6px', boxShadow: 2 }}
                 />
               )}
             </Box>
             {image.status === 'ready' && !image.backgroundIncluded && (
               <Alert severity="info">
-                The custom background image doesn’t allow sharing, so the image uses a plain background.
+                A imagem de fundo personalizada não permite compartilhamento, então a imagem usa um fundo simples.
               </Alert>
             )}
           </Stack>
@@ -195,16 +205,18 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
           <Divider />
 
           {image.status === 'ready' ? (
-            <ShareTargets file={image.file} orientationLabel={orientationLabel} title={title} link={link} />
+            <ShareTargets file={image.file} imageName={selectedOrientation.imageName} title={title} link={link} />
           ) : (
             <Typography variant="body2" color="text.secondary">
-              {image.status === 'loading' ? 'Preparing the image…' : 'Sharing needs the image. Copy the link above instead.'}
+              {image.status === 'loading'
+                ? 'Preparando a imagem…'
+                : 'O compartilhamento precisa da imagem. Copie o link acima.'}
             </Typography>
           )}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>Fechar</Button>
       </DialogActions>
     </Dialog>
   );
