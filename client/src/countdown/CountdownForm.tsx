@@ -11,6 +11,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import AddPhotoAlternateRoundedIcon from '@mui/icons-material/AddPhotoAlternateRounded';
 import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { useTranslation } from '../i18n/I18nProvider';
 import ColorField from './ColorField';
 import {
   Background,
@@ -28,11 +29,12 @@ import {
   resolveAssetUrl,
 } from './config';
 import { IMAGE_URL_ERROR, validateCountdownConfig } from './validation';
+import { TranslationKey } from '../i18n/translations';
 
-const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
-  { type: 'solid', label: 'Solid color' },
-  { type: 'gradient', label: 'Gradient' },
-  { type: 'image', label: 'Image' },
+const BACKGROUND_OPTIONS: { type: BackgroundType; labelKey: TranslationKey }[] = [
+  { type: 'solid', labelKey: 'form.background.solid' },
+  { type: 'gradient', labelKey: 'form.background.gradient' },
+  { type: 'image', labelKey: 'form.background.image' },
 ];
 
 interface CountdownFormProps {
@@ -44,6 +46,7 @@ interface CountdownFormProps {
 
 function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormProps) {
   const { background } = config;
+  const { t } = useTranslation();
   const errors = showErrors ? validateCountdownConfig(config) : {};
 
   function update(changes: Partial<CountdownConfig>) {
@@ -109,17 +112,17 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
       <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
         <Stack spacing={2.5}>
           <TextField
-            label="Title"
-            placeholder="Trip to Lisbon"
+            label={t('form.title')}
+            placeholder={t('form.titlePlaceholder')}
             value={config.title}
             onChange={(event) => update({ title: event.target.value })}
             error={Boolean(errors.title)}
-            helperText={errors.title ?? `${config.title.length}/${TITLE_MAX_LENGTH}`}
+            helperText={errors.title ? t(errors.title) : `${config.title.length}/${TITLE_MAX_LENGTH}`}
             slotProps={{ htmlInput: { maxLength: TITLE_MAX_LENGTH } }}
           />
 
           <DateTimePicker
-            label="Finish date"
+            label={t('form.finishDate')}
             value={config.finishDate}
             onChange={(value) => update({ finishDate: value })}
             disablePast
@@ -127,14 +130,14 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
               textField: {
                 fullWidth: true,
                 error: errors.finishDate ? true : undefined,
-                helperText: errors.finishDate,
+                helperText: errors.finishDate && t(errors.finishDate),
               },
             }}
           />
 
           <Stack spacing={1.5}>
             <FormLabel component="legend" id="background-label">
-              Background
+              {t('form.background')}
             </FormLabel>
             <ToggleButtonGroup
               exclusive
@@ -145,22 +148,22 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
               value={background.type}
               onChange={(_event, value: BackgroundType | null) => changeBackgroundType(value)}
             >
-              {BACKGROUND_OPTIONS.map(({ type, label }) => (
+              {BACKGROUND_OPTIONS.map(({ type, labelKey }) => (
                 <ToggleButton key={type} value={type}>
-                  {label}
+                  {t(labelKey)}
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
 
             {background.type === 'solid' && (
-              <ColorField label="Background color" value={background.color} onChange={(color) => updateBackground({ color })} />
+              <ColorField label={t('form.backgroundColor')} value={background.color} onChange={(color) => updateBackground({ color })} />
             )}
 
             {background.type === 'gradient' && (
               <>
                 <Box
                   role="group"
-                  aria-label="Gradient presets"
+                  aria-label={t('form.gradientPresets')}
                   sx={{ display: 'grid', gap: 1, gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' } }}
                 >
                   {GRADIENT_PRESETS.map((preset) => (
@@ -188,15 +191,15 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
                   ))}
                 </Box>
                 <Stack direction="row" spacing={1.5}>
-                  <ColorField label="Start color" value={background.from} onChange={(from) => updateBackground({ from })} />
-                  <ColorField label="End color" value={background.to} onChange={(to) => updateBackground({ to })} />
+                  <ColorField label={t('form.startColor')} value={background.from} onChange={(from) => updateBackground({ from })} />
+                  <ColorField label={t('form.endColor')} value={background.to} onChange={(to) => updateBackground({ to })} />
                 </Stack>
               </>
             )}
 
             {background.type === 'image' && (
               <>
-                <Box role="group" aria-label="Image presets" sx={{ display: 'grid', gap: 1, gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                <Box role="group" aria-label={t('form.imagePresets')} sx={{ display: 'grid', gap: 1, gridTemplateColumns: 'repeat(2, 1fr)' }}>
                   {IMAGE_PRESETS.map((preset) => (
                     <ToggleButton
                       key={preset.name}
@@ -229,18 +232,18 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
                   >
                     <AddPhotoAlternateRoundedIcon aria-hidden sx={{ width: 20, height: 20, flexShrink: 0 }} />
                     <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      Custom
+                      {t('form.imageCustom')}
                     </Box>
                   </ToggleButton>
                 </Box>
                 {isCustomImage && (
                   <TextField
-                    label="Image URL"
+                    label={t('form.imageUrl')}
                     type="url"
-                    placeholder="https://example.com/beach.jpg"
+                    placeholder={t('form.imageUrlPlaceholder')}
                     value={background.url}
                     error={Boolean(imageUrlError)}
-                    helperText={imageUrlError ?? ' '}
+                    helperText={imageUrlError ? t(imageUrlError) : ' '}
                     onChange={(event) => updateBackground({ url: event.target.value })}
                     slotProps={{ htmlInput: { maxLength: IMAGE_URL_MAX_LENGTH } }}
                   />
@@ -250,11 +253,11 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
           </Stack>
 
           <Stack spacing={1.5}>
-            <FormLabel component="legend">Font colors</FormLabel>
+            <FormLabel component="legend">{t('form.fontColors')}</FormLabel>
             <Stack direction="row" spacing={1.5}>
-              <ColorField label="Title color" value={config.titleColor} onChange={(titleColor) => update({ titleColor })} />
+              <ColorField label={t('form.titleColor')} value={config.titleColor} onChange={(titleColor) => update({ titleColor })} />
               <ColorField
-                label="Counter color"
+                label={t('form.counterColor')}
                 value={config.counterColor}
                 onChange={(counterColor) => update({ counterColor })}
               />
@@ -262,7 +265,7 @@ function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormP
           </Stack>
 
           <Button type="submit" variant="contained" size="large" fullWidth startIcon={<ShareRoundedIcon />}>
-            Share
+            {t('action.share')}
           </Button>
         </Stack>
       </CardContent>

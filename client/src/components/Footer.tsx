@@ -4,8 +4,11 @@ import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Brand from './Brand';
+import { useTranslation } from '../i18n/I18nProvider';
 
 function Footer() {
+  const { t } = useTranslation();
+
   return (
     <Box component="footer" sx={{ mt: 'auto', py: 2.5, borderTop: 1, borderColor: 'divider', color: 'text.secondary' }}>
       <Container>
@@ -15,7 +18,7 @@ function Footer() {
         >
           <Brand size={24} nameSx={{ fontSize: '0.875rem' }} />
           <Typography variant="body2">
-            Developed by{' '}
+            {t('footer.developedBy')}{' '}
             <Link href="https://matheusalves.dev/" target="_blank" rel="noopener noreferrer">
               Matheus Alves
             </Link>{' '}

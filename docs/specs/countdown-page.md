@@ -5,10 +5,10 @@ Visual definitions (colors, typography, logo) are in the [Style guide](style-gui
 ## Requirements
 
 - **Route**: `/countdown/<token>`, matching the [Countdown link specification](countdown-link.md#2-url-format). No other route exists for this page.
-- **Header**: logo and the feature name "Travel Countdown", plus the page actions (**Create my countdown** and **Share**, in that order) when the token is valid.
+- **Header**: logo and the feature name "Travel Countdown" linking to the home page, the page actions (**Edit countdown** and **Share**, in that order) when the token is valid, and the [language selector](i18n.md).
 - **Valid token**: displays the countdown from the token's configuration (title, finish date, background, font colors), same as the home page's preview, but filling the page's viewport instead of a small box.
 - **Invalid token**: the token fails to decode or fails validation ([Countdown link specification §4.2](countdown-link.md#42-when-reading-a-token)). Shows an "Invalid countdown link" message instead of a countdown.
-- **Actions**: with a valid token, **Create my countdown** and **Share** (re-share this countdown) live in the header, in that order, with Share highlighted over Create. With an invalid token, the page shows only the centered **Create my countdown** button.
+- **Actions**: with a valid token, **Edit countdown** and **Share** (re-share this countdown) live in the header, in that order, with Share highlighted over Edit. With an invalid token, the page shows only the centered **Create my countdown** button.
 
 ## Details
 
@@ -22,10 +22,10 @@ Visual definitions (colors, typography, logo) are in the [Style guide](style-gui
 
 | Action               | Style                                    | Behaviour                                                                    |
 | -------------------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
-| **Create my countdown** | `text` (less prominent)               | Link to the home page                                                        |
+| **Edit countdown**   | `text` (less prominent)                  | Link to `<base URL>?edit=<token>`, which opens the home form with this countdown loaded |
 | **Share**            | `contained`, primary, share icon (more prominent) | Opens the share modal for the countdown being viewed ([Share action specification](share-action.md)), with the page's own URL as the link and the image rendered from the token's configuration |
 
-On narrow screens the button reads **Create** and the brand name is hidden, keeping the header on one line.
+On narrow screens the button reads **Edit** and the brand name is hidden, keeping the header on one line.
 
 ### Invalid token
 
@@ -42,6 +42,7 @@ On narrow screens the button reads **Create** and the brand name is hidden, keep
 | ------------------------------------- | ------------------------------------ |
 | Route matching (`/countdown/<token>`) | `client/src/App.tsx`                 |
 | Page (valid/invalid states, actions)  | `client/src/pages/CountdownPage.tsx` |
+| Loading a countdown into the form     | `client/src/pages/Home.tsx` (`?edit=<token>`) |
 | Header with optional actions          | `client/src/components/Header.tsx`   |
 | Share modal                           | `client/src/countdown/ShareDialog.tsx` |
 | Countdown display (`variant="page"`)  | `client/src/countdown/Countdown.tsx` |

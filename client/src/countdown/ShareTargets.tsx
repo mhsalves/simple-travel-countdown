@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import { useTranslation } from '../i18n/I18nProvider';
 import {
   NativeShareResult,
   copyImageToClipboard,
@@ -48,23 +49,20 @@ const TARGETS: { value: Target; icon: JSX.Element }[] = [
   { value: 'Other', icon: <ShareRoundedIcon /> },
 ];
 
-const APP_TEXT_DROP_NOTE =
-  'Some apps keep only the image and drop the message. If the link is missing, copy it above and paste it in the chat.';
-
 interface ShareTargetsProps {
   file: File;
-  orientationLabel: string;
+  imageName: string;
   title: string;
   link: string;
 }
 
-function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps) {
+function ShareTargets({ file, imageName, title, link }: ShareTargetsProps) {
+  const { t } = useTranslation();
   const isMobile = useMemo(isMobileDevice, []);
   const nativeSupport = useMemo(() => getNativeShareSupport(file), [file]);
   const [clipboardAllowed, setClipboardAllowed] = useState<boolean | null>(null);
   const [target, setTarget] = useState<Target | null>(isMobile ? 'Other' : null);
   const [feedback, setFeedback] = useState<Feedback>(null);
-  const image = `${orientationLabel.toLowerCase()} image`;
 
   useEffect(() => {
     let active = true;
@@ -76,9 +74,9 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
 
   function showNativeResult(result: NativeShareResult) {
     if (result === 'shared') {
-      setFeedback({ severity: 'success', message: 'Countdown shared' });
+      setFeedback({ severity: 'success', message: t('targets.shared') });
     } else if (result === 'failed') {
-      setFeedback({ severity: 'error', message: 'Couldn’t open the share options. Copy the link above instead.' });
+      setFeedback({ severity: 'error', message: t('targets.shareFailed') });
     }
   }
 
@@ -90,13 +88,17 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
     }
     const opened = openInNewTab(url);
 
-    let message = `Image copied. Choose a chat in ${app} and paste it (${getPasteShortcut()}) to attach it.`;
+    let message = t('targets.copiedFeedback', { app, shortcut: getPasteShortcut() });
     if (!copied) {
       message = clipboardAllowed
-        ? `Couldn’t copy the image, so it was downloaded instead. Attach ${file.name} to the ${app} chat.`
-        : `Image downloaded. Attach ${file.name} to the ${app} chat.`;
+        ? t('targets.copyFailedFeedback', { app, file: file.name })
+        : t('targets.downloadedFeedback', { app, file: file.name });
     }
-    setFeedback({ severity: 'success', message, action: opened ? undefined : { label: `Open ${app}`, url } });
+    setFeedback({
+      severity: 'success',
+      message,
+      action: opened ? undefined : { label: t('targets.openApp', { app }), url },
+    });
   }
 
   async function shareWithSystem() {
@@ -104,60 +106,44 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
   }
 
   function getAppInstructions(app: AppTarget): Instructions {
-    const opens = `${app} opens in a new tab with a message containing the countdown link.`;
+    const opens = t('targets.opensStep', { app });
     if (clipboardAllowed) {
       return {
         steps: [
-          `The ${image} is copied to your clipboard.`,
+          t('targets.copyStep', { image: imageName }),
           opens,
-          `Choose a chat and paste the image (${getPasteShortcut()}) to attach it.`,
+          t('targets.pasteStep', { shortcut: getPasteShortcut() }),
         ],
-        actionLabel: `Copy image and open ${app}`,
+        actionLabel: t('targets.copyAction', { app }),
         action: () => shareToApp(app),
       };
     }
     return {
-      steps: [
-        <>
-          Your browser can’t copy images, so the {image} is downloaded to your computer as <strong>{file.name}</strong>.
-        </>,
-        opens,
-        'Choose a chat and attach the downloaded image.',
-      ],
-      actionLabel: `Download image and open ${app}`,
+      steps: [t('targets.downloadStep', { image: imageName, file: file.name }), opens, t('targets.attachStep')],
+      actionLabel: t('targets.downloadAction', { app }),
       action: () => shareToApp(app),
     };
   }
 
   function getNativeInstructions(): Instructions {
-    const shareOptions = isMobile ? 'Your phone’s share options' : 'Your system’s share options';
+    const options = isMobile ? t('targets.phoneOptions') : t('targets.systemOptions');
     if (nativeSupport === 'image') {
       return {
-        steps: [
-          `${shareOptions} open with the ${image} and a message containing the countdown link.`,
-          'Choose WhatsApp, Telegram or any other app to send them.',
-        ],
-        note: APP_TEXT_DROP_NOTE,
-        actionLabel: 'Share image and link',
+        steps: [t('targets.nativeStep', { options, image: imageName }), t('targets.nativeChooseStep')],
+        note: t('targets.nativeNote'),
+        actionLabel: t('targets.nativeAction'),
         action: shareWithSystem,
       };
     }
     if (nativeSupport === 'link') {
       return {
-        steps: [
-          'Your browser can share the link but not images.',
-          `${shareOptions} open with a message containing the countdown link, without the image.`,
-        ],
-        actionLabel: 'Share link',
+        steps: [t('targets.linkOnlyStep'), t('targets.linkOnlyOptionsStep', { options })],
+        actionLabel: t('targets.linkOnlyAction'),
         action: shareWithSystem,
       };
     }
     return {
-      steps: [
-        isMobile
-          ? 'Your browser doesn’t support sharing. Copy the link above and paste it in any app.'
-          : 'Your browser doesn’t support system sharing. Use WhatsApp, Telegram or copy the link above.',
-      ],
+      steps: [isMobile ? t('targets.unsupportedMobile') : t('targets.unsupportedWeb')],
     };
   }
 
@@ -172,7 +158,7 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
   return (
     <Stack spacing={1.5}>
       <FormLabel component="p" id="share-targets-label">
-        Share to
+        {t('targets.label')}
       </FormLabel>
 
       {!isMobile && (
@@ -190,7 +176,7 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
           {TARGETS.map(({ value, icon }) => (
             <ToggleButton key={value} value={value} sx={{ gap: 1 }}>
               {icon}
-              {value}
+              {value === 'Other' ? t('targets.other') : value}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
@@ -198,7 +184,7 @@ function ShareTargets({ file, orientationLabel, title, link }: ShareTargetsProps
 
       {!target && (
         <Typography variant="body2" color="text.secondary">
-          Choose where to share to see how the image and link are sent.
+          {t('targets.choose')}
         </Typography>
       )}
 

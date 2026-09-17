@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
+import { useTranslation } from '../i18n/I18nProvider';
 import Header from '../components/Header';
 import Countdown from '../countdown/Countdown';
 import ShareDialog from '../countdown/ShareDialog';
@@ -12,25 +13,33 @@ interface CountdownPageProps {
   token: string;
 }
 
-function CreateCountdownButton({ variant = 'contained' }: { variant?: 'contained' | 'text' }) {
-  const inHeader = variant === 'text';
+function CreateCountdownButton() {
+  const { t } = useTranslation();
+  return (
+    <Button component="a" href={import.meta.env.BASE_URL} variant="contained" size="large">
+      {t('action.create')}
+    </Button>
+  );
+}
+
+// Opens the home form with this countdown loaded.
+function EditCountdownButton({ token }: { token: string }) {
+  const { t } = useTranslation();
   return (
     <Button
       component="a"
-      href={import.meta.env.BASE_URL}
-      variant={variant}
-      size={inHeader ? 'medium' : 'large'}
-      sx={inHeader ? { flexShrink: 0, px: 1.5 } : undefined}
+      href={`${import.meta.env.BASE_URL}?edit=${token}`}
+      variant="text"
+      sx={{ flexShrink: 0, px: 1.5, whiteSpace: 'nowrap' }}
     >
-      Create
-      <Box component="span" sx={inHeader ? { display: { xs: 'none', sm: 'inline' }, pl: 0.5 } : { pl: 0.5 }}>
-        my countdown
-      </Box>
+      <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>{t('action.edit')}</Box>
+      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>{t('action.editCountdown')}</Box>
     </Button>
   );
 }
 
 function CountdownPage({ token }: CountdownPageProps) {
+  const { t } = useTranslation();
   const config = useMemo(() => decodeCountdownToken(token), [token]);
   const [share, setShare] = useState<{ id: number; generatedAt: Date } | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -58,10 +67,10 @@ function CountdownPage({ token }: CountdownPageProps) {
           }}
         >
           <Typography variant="h1" sx={{ fontSize: '1.5rem' }}>
-            Invalid countdown link
+            {t('page.invalidTitle')}
           </Typography>
           <Typography color="text.secondary" sx={{ maxWidth: 420 }}>
-            This link is broken or has expired. Create a new countdown to get a working link.
+            {t('page.invalidText')}
           </Typography>
           <Box sx={{ mt: 1 }}>
             <CreateCountdownButton />
@@ -76,9 +85,9 @@ function CountdownPage({ token }: CountdownPageProps) {
       <Header
         actions={
           <>
-            <CreateCountdownButton variant="text" />
+            <EditCountdownButton token={token} />
             <Button variant="contained" startIcon={<ShareRoundedIcon />} onClick={handleShare} sx={{ flexShrink: 0 }}>
-              Share
+              {t('action.share')}
             </Button>
           </>
         }

@@ -11,7 +11,8 @@ The project is an npm workspaces monorepo with two packages.
 │   │   ├── main.tsx     App entry point
 │   │   ├── App.tsx      Root component
 │   │   ├── theme.ts     Material UI theme (style guide tokens)
-│   │   ├── components/  Shared layout components (header, footer, logo)
+│   │   ├── components/  Shared layout components (header, footer, logo, language selector)
+│   │   ├── i18n/        Translations and language provider
 │   │   ├── pages/       Page components
 │   │   └── countdown/   Countdown configuration, timer, form and display
 │   └── vite.config.ts

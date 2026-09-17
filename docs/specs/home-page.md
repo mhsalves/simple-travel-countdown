@@ -4,7 +4,7 @@ Visual definitions (colors, typography, form components, logo) are in the [Style
 
 ## Requirements
 
-- **Header**: simple header with the logo and the feature name "Travel Countdown".
+- **Header**: simple header with the logo and the feature name "Travel Countdown", linking to the home page, and the [language selector](i18n.md).
 - **Content**: split into two areas:
   - **Form** to create a countdown, with the options:
     - Title

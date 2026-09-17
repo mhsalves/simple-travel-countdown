@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { Translate } from '../i18n/I18nProvider';
 import { Background, CountdownConfig, FALLBACK_BACKGROUND, IMAGE_OVERLAY, isHttpUrl } from './config';
 import { getCountdownDisplay } from './display';
 
@@ -162,6 +163,7 @@ export async function renderShareImage(
   config: CountdownConfig,
   orientation: ImageOrientation,
   generatedAt: Date,
+  t: Translate,
 ): Promise<ShareImage> {
   const { width, height } = IMAGE_SIZES[orientation];
   const canvas = document.createElement('canvas');
@@ -175,7 +177,7 @@ export async function renderShareImage(
   const shortSide = Math.min(width, height);
   const scale = shortSide / PREVIEW_HEIGHT;
   const contentWidth = width * CONTENT_WIDTH_RATIO;
-  const { title, units, status } = getCountdownDisplay(config, generatedAt.getTime());
+  const { title, units, status } = getCountdownDisplay(config, generatedAt.getTime(), t);
 
   await Promise.all([
     document.fonts.load(font(700, 64)),

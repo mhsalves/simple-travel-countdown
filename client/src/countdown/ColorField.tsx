@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
+import { useTranslation } from '../i18n/I18nProvider';
 import { isHexColor } from './config';
 
 interface ColorFieldProps {
@@ -11,6 +12,7 @@ interface ColorFieldProps {
 }
 
 function ColorField({ label, value, onChange }: ColorFieldProps) {
+  const { t } = useTranslation();
   const [draft, setDraft] = useState(value);
 
   useEffect(() => {
@@ -39,7 +41,7 @@ function ColorField({ label, value, onChange }: ColorFieldProps) {
               <Box
                 component="input"
                 type="color"
-                aria-label={`${label} picker`}
+                aria-label={t('form.colorPicker', { label })}
                 value={value}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value.toUpperCase())}
                 sx={{

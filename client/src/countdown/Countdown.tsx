@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useTranslation } from '../i18n/I18nProvider';
 import { CountdownConfig, getBackgroundStyle } from './config';
 import { getCountdownDisplay } from './display';
 import { useNow } from './timeLeft';
@@ -12,7 +13,8 @@ interface CountdownProps {
 
 function Countdown({ config, variant = 'preview' }: CountdownProps) {
   const now = useNow();
-  const { title, units, status } = getCountdownDisplay(config, now);
+  const { t } = useTranslation();
+  const { title, units, status } = getCountdownDisplay(config, now, t);
   const isPage = variant === 'page';
 
   return (

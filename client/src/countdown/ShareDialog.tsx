@@ -21,6 +21,7 @@ import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import CropLandscapeRoundedIcon from '@mui/icons-material/CropLandscapeRounded';
 import CropPortraitRoundedIcon from '@mui/icons-material/CropPortraitRounded';
 import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
+import { useTranslation } from '../i18n/I18nProvider';
 import ShareTargets from './ShareTargets';
 import { CountdownConfig } from './config';
 import { getShareImageFileName } from './share';
@@ -33,10 +34,10 @@ type RenderedImage =
   | { status: 'error' }
   | { status: 'ready'; file: File; url: string; backgroundIncluded: boolean };
 
-const ORIENTATIONS: { value: ImageOrientation; label: string; icon: JSX.Element }[] = [
-  { value: 'landscape', label: 'Landscape', icon: <CropLandscapeRoundedIcon /> },
-  { value: 'vertical', label: 'Vertical', icon: <CropPortraitRoundedIcon /> },
-];
+const ORIENTATIONS = [
+  { value: 'landscape', labelKey: 'share.landscape', imageKey: 'share.landscapeImage', icon: <CropLandscapeRoundedIcon /> },
+  { value: 'vertical', labelKey: 'share.vertical', imageKey: 'share.verticalImage', icon: <CropPortraitRoundedIcon /> },
+] as const;
 
 interface ShareDialogProps {
   open: boolean;
@@ -49,6 +50,7 @@ interface ShareDialogProps {
 function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const { t } = useTranslation();
   const title = config.title.trim();
 
   const [copyStatus, setCopyStatus] = useState<CopyStatus>('idle');
@@ -63,7 +65,7 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
     const urls: string[] = [];
 
     ORIENTATIONS.forEach(({ value }) => {
-      renderShareImage(config, value, generatedAt)
+      renderShareImage(config, value, generatedAt, t)
         .then(({ blob, backgroundIncluded }) => {
           if (!active) {
             return;
@@ -84,10 +86,10 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
       active = false;
       urls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [config, generatedAt, title]);
+  }, [config, generatedAt, title, t]);
 
   const image = images[orientation];
-  const orientationLabel = ORIENTATIONS.find(({ value }) => value === orientation)?.label ?? '';
+  const selectedOrientation = ORIENTATIONS.find(({ value }) => value === orientation) ?? ORIENTATIONS[0];
 
   async function handleCopy() {
     try {
@@ -109,15 +111,15 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
     >
       <DialogTitle id="share-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
         <ShareRoundedIcon color="primary" />
-        Share your countdown
+        {t('share.title')}
       </DialogTitle>
       <DialogContent>
         <Stack spacing={3}>
           <Stack spacing={1.5}>
-            <FormLabel component="p">Link</FormLabel>
+            <FormLabel component="p">{t('share.link')}</FormLabel>
             <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
               <TextField
-                label="Countdown link"
+                label={t('share.linkField')}
                 size="small"
                 value={link}
                 onFocus={(event) => event.target.select()}
@@ -130,11 +132,11 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
                 onClick={handleCopy}
                 sx={{ flexShrink: 0 }}
               >
-                {copyStatus === 'copied' ? 'Copied' : 'Copy'}
+                {copyStatus === 'copied' ? t('share.copied') : t('share.copy')}
               </Button>
             </Stack>
             {copyStatus === 'failed' && (
-              <Alert severity="error">Couldn’t copy automatically. Select the link and copy it manually.</Alert>
+              <Alert severity="error">{t('share.copyFailed')}</Alert>
             )}
           </Stack>
 
@@ -142,7 +144,7 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
 
           <Stack spacing={1.5}>
             <FormLabel component="p" id="share-image-label">
-              Image
+              {t('share.image')}
             </FormLabel>
             <ToggleButtonGroup
               exclusive
@@ -153,10 +155,10 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
               value={orientation}
               onChange={(_event, value: ImageOrientation | null) => value && setOrientation(value)}
             >
-              {ORIENTATIONS.map(({ value, label, icon }) => (
+              {ORIENTATIONS.map(({ value, labelKey, icon }) => (
                 <ToggleButton key={value} value={value} sx={{ gap: 1 }}>
                   {icon}
-                  {label}
+                  {t(labelKey)}
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
@@ -174,37 +176,35 @@ function ShareDialog({ open, link, config, generatedAt, onClose }: ShareDialogPr
                 borderColor: 'divider',
               }}
             >
-              {image.status === 'loading' && <CircularProgress aria-label="Rendering image" />}
-              {image.status === 'error' && <Alert severity="error">Couldn’t create the image.</Alert>}
+              {image.status === 'loading' && <CircularProgress aria-label={t('share.rendering')} />}
+              {image.status === 'error' && <Alert severity="error">{t('share.imageError')}</Alert>}
               {image.status === 'ready' && (
                 <Box
                   component="img"
                   src={image.url}
-                  alt={`${orientationLabel} image of the countdown for ${title}`}
+                  alt={t('share.imageAlt', { orientation: t(selectedOrientation.labelKey), title })}
                   sx={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '6px', boxShadow: 2 }}
                 />
               )}
             </Box>
             {image.status === 'ready' && !image.backgroundIncluded && (
-              <Alert severity="info">
-                The custom background image doesn’t allow sharing, so the image uses a plain background.
-              </Alert>
+              <Alert severity="info">{t('share.backgroundNotice')}</Alert>
             )}
           </Stack>
 
           <Divider />
 
           {image.status === 'ready' ? (
-            <ShareTargets file={image.file} orientationLabel={orientationLabel} title={title} link={link} />
+            <ShareTargets file={image.file} imageName={t(selectedOrientation.imageKey)} title={title} link={link} />
           ) : (
             <Typography variant="body2" color="text.secondary">
-              {image.status === 'loading' ? 'Preparing the image…' : 'Sharing needs the image. Copy the link above instead.'}
+              {image.status === 'loading' ? t('share.preparing') : t('share.imageNeeded')}
             </Typography>
           )}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('action.close')}</Button>
       </DialogActions>
     </Dialog>
   );
