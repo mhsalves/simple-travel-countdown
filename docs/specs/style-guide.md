@@ -132,6 +132,7 @@ A single theme created with `createTheme` and applied with `ThemeProvider` + `Cs
 | Image URL             | `TextField` (`type="url"`)                        | Shown only when Custom is selected; `error` + `helperText` when the URL is not `http(s)` |
 | Share (form)          | `Button` (`type="submit"`, `variant="contained"`, `size="large"`, `fullWidth`) | Primary color, `ShareRounded` start icon |
 | Share (preview)       | `Button` (`variant="outlined"`, `size="large"`, `fullWidth`) | Below the preview, 16px top margin, `ShareRounded` start icon |
+| Header actions (countdown page) | `Button`s in the header, right aligned, 8px gap | **Create my countdown** `text`, then **Share** `contained` with `ShareRounded` icon (primary emphasis); the brand name is hidden below `sm` |
 | Field errors          | `error` + `helperText` on the field               | Shown after the first share attempt; the title counter is replaced by its error |
 | Share modal           | `Dialog` (`maxWidth="sm"`, `fullWidth`, `fullScreen` below `sm`) | `DialogTitle` with `ShareRounded` in `primary` color; sections Link, Image, Share to separated by `Divider`, each titled with `FormLabel` |
 | Share link            | Small read-only `TextField` + `outlined` **Copy** `Button` | After copying: `success` color, `CheckRounded` icon and "Copied" |
