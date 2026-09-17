@@ -1,6 +1,6 @@
 import { CountdownConfig, isHttpUrl } from './config';
 
-// Generation rules from docs/specs/countdown-link.md (4.1).
+// Share validation rules from docs/specs/countdown-link.md (4.1).
 
 export interface CountdownFormErrors {
   title?: string;

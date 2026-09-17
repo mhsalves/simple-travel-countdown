@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -9,6 +9,7 @@ import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import AddPhotoAlternateRoundedIcon from '@mui/icons-material/AddPhotoAlternateRounded';
+import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import ColorField from './ColorField';
 import {
@@ -26,7 +27,7 @@ import {
   isHttpUrl,
   resolveAssetUrl,
 } from './config';
-import { IMAGE_URL_ERROR, hasErrors, validateCountdownConfig } from './validation';
+import { IMAGE_URL_ERROR, validateCountdownConfig } from './validation';
 
 const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
   { type: 'solid', label: 'Solid color' },
@@ -37,13 +38,13 @@ const BACKGROUND_OPTIONS: { type: BackgroundType; label: string }[] = [
 interface CountdownFormProps {
   config: CountdownConfig;
   onChange: (config: CountdownConfig) => void;
-  onGenerate: () => void;
+  showErrors: boolean;
+  onShare: () => void;
 }
 
-function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
+function CountdownForm({ config, onChange, showErrors, onShare }: CountdownFormProps) {
   const { background } = config;
-  const [submitted, setSubmitted] = useState(false);
-  const errors = submitted ? validateCountdownConfig(config) : {};
+  const errors = showErrors ? validateCountdownConfig(config) : {};
 
   function update(changes: Partial<CountdownConfig>) {
     onChange({ ...config, ...changes });
@@ -96,10 +97,7 @@ function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setSubmitted(true);
-    if (!hasErrors(validateCountdownConfig(config))) {
-      onGenerate();
-    }
+    onShare();
   }
 
   const imageUrlError =
@@ -263,8 +261,8 @@ function CountdownForm({ config, onChange, onGenerate }: CountdownFormProps) {
             </Stack>
           </Stack>
 
-          <Button type="submit" variant="contained" size="large" fullWidth>
-            Generate link
+          <Button type="submit" variant="contained" size="large" fullWidth startIcon={<ShareRoundedIcon />}>
+            Share
           </Button>
         </Stack>
       </CardContent>

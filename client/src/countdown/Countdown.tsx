@@ -2,9 +2,8 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { CountdownConfig, getBackgroundStyle } from './config';
-import { getTimeLeft, useNow } from './timeLeft';
-
-const TITLE_PLACEHOLDER = 'Your trip title';
+import { getCountdownDisplay } from './display';
+import { useNow } from './timeLeft';
 
 interface CountdownProps {
   config: CountdownConfig;
@@ -13,23 +12,8 @@ interface CountdownProps {
 
 function Countdown({ config, variant = 'preview' }: CountdownProps) {
   const now = useNow();
-  const target = config.finishDate?.isValid() ? config.finishDate.toDate() : null;
-  const timeLeft = getTimeLeft(target ?? new Date(now), now);
+  const { title, units, status } = getCountdownDisplay(config, now);
   const isPage = variant === 'page';
-
-  const units = [
-    { label: 'Days', value: timeLeft.days },
-    { label: 'Hours', value: timeLeft.hours },
-    { label: 'Minutes', value: timeLeft.minutes },
-    { label: 'Seconds', value: timeLeft.seconds },
-  ];
-
-  let status = '';
-  if (!target) {
-    status = 'Choose a finish date';
-  } else if (timeLeft.finished) {
-    status = 'The countdown has finished';
-  }
 
   return (
     <Stack
@@ -58,7 +42,7 @@ function Countdown({ config, variant = 'preview' }: CountdownProps) {
         }}
         style={{ color: config.titleColor }}
       >
-        {config.title.trim() || TITLE_PLACEHOLDER}
+        {title}
       </Typography>
 
       <Stack
@@ -73,7 +57,7 @@ function Countdown({ config, variant = 'preview' }: CountdownProps) {
               variant="countdownValue"
               sx={isPage ? { fontSize: 'clamp(3rem, 12vw, 6rem)' } : undefined}
             >
-              {String(value).padStart(2, '0')}
+              {value}
             </Typography>
             <Typography variant="overline" sx={{ opacity: 0.85 }}>
               {label}

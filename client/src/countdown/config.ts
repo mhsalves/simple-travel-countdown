@@ -101,7 +101,8 @@ export function isHttpUrl(value: string): boolean {
   }
 }
 
-const FALLBACK_BACKGROUND = '#1F2A33';
+export const FALLBACK_BACKGROUND = '#1F2A33';
+export const IMAGE_OVERLAY = 'rgba(0, 0, 0, 0.4)';
 
 export function getBackgroundStyle(background: Background): CSSProperties {
   switch (background.type) {
@@ -115,7 +116,7 @@ export function getBackgroundStyle(background: Background): CSSProperties {
       }
       return {
         backgroundColor: FALLBACK_BACKGROUND,
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${JSON.stringify(background.url)})`,
+        backgroundImage: `linear-gradient(${IMAGE_OVERLAY}, ${IMAGE_OVERLAY}), url(${JSON.stringify(background.url)})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       };
